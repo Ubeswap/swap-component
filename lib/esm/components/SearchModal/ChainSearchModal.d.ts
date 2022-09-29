@@ -1,6 +1,6 @@
 /// <reference types="react" />
 import { Network } from '@celo-tools/use-contractkit';
-import { WrappedTokenInfo } from 'state/lists/hooks';
+import { WrappedTokenInfo } from '../../state/lists/hooks';
 export declare type Chain = {
     network: Network;
     token: WrappedTokenInfo;

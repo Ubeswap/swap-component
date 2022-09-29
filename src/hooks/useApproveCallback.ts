@@ -7,7 +7,8 @@ import { useDoTransaction } from '../components/swap/routing'
 import { MoolaRouterTrade } from '../components/swap/routing/hooks/useTrade'
 import { MoolaDirectTrade } from '../components/swap/routing/moola/MoolaDirectTrade'
 import { useMoolaConfig } from '../components/swap/routing/moola/useMoola'
-import { ROUTER_ADDRESS, UBESWAP_MOOLA_ROUTER_ADDRESS } from '../constants'
+import { MinimaRouterTrade } from '../components/swap/routing/trade'
+import { MINIMA_ROUTER_ADDRESS, ROUTER_ADDRESS, UBESWAP_MOOLA_ROUTER_ADDRESS } from '../constants'
 import { useTokenAllowance } from '../data/Allowances'
 import { Field } from '../state/swap/actions'
 import { useHasPendingApproval } from '../state/transactions/hooks'
@@ -116,7 +117,9 @@ export function useApproveCallbackFromTrade(trade?: Trade, allowedSlippage = 0) 
   const moola = useMoolaConfig()
   return useApproveCallback(
     amountToApprove,
-    trade instanceof MoolaDirectTrade
+    trade instanceof MinimaRouterTrade
+      ? MINIMA_ROUTER_ADDRESS
+      : trade instanceof MoolaDirectTrade
       ? moola?.lendingPool
       : trade instanceof MoolaRouterTrade
       ? UBESWAP_MOOLA_ROUTER_ADDRESS

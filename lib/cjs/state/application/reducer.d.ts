@@ -12,5 +12,5 @@ export interface ApplicationState {
     readonly popupList: PopupList;
     readonly openModal: ApplicationModal | null;
 }
-declare const _default: import("redux").Reducer<ApplicationState, import("redux").AnyAction>;
+declare const _default: import("@reduxjs/toolkit/dist/createReducer").ReducerWithInitialState<ApplicationState>;
 export default _default;

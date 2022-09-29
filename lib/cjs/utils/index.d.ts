@@ -2,7 +2,7 @@ import { BigNumber } from '@ethersproject/bignumber';
 import { Contract } from '@ethersproject/contracts';
 import { JsonRpcSigner, Web3Provider } from '@ethersproject/providers';
 import { JSBI, Percent, Token, TokenAmount } from '@ubeswap/sdk';
-import { IUniswapV2Router02, UbeswapMoolaRouter } from 'generated/index';
+import { IUniswapV2Router02, UbeswapMoolaRouter } from '../generated/index';
 import { TokenAddressMap } from '../state/lists/hooks';
 export declare function isAddress(value: any): string | false;
 export declare function shortenAddress(address: string, chars?: number): string;

@@ -1,6 +1,6 @@
 import { BigNumber } from '@ethersproject/bignumber';
 import { Pair, Token, TokenAmount } from '@ubeswap/sdk';
-import { PoolManager } from 'generated/';
+import { PoolManager } from '../../generated/';
 export declare const STAKING_GENESIS = 1619100000;
 export interface StakingInfo {
     readonly stakingRewardAddress: string | undefined;

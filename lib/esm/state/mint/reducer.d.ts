@@ -4,5 +4,5 @@ export interface MintState {
     readonly typedValue: string;
     readonly otherTypedValue: string;
 }
-declare const _default: import("redux").Reducer<MintState, import("redux").AnyAction>;
+declare const _default: import("@reduxjs/toolkit/dist/createReducer").ReducerWithInitialState<MintState>;
 export default _default;

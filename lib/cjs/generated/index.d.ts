@@ -8,6 +8,7 @@ export type { IUniswapV2Router02 } from "./IUniswapV2Router02";
 export type { LimitOrderProtocol } from "./LimitOrderProtocol";
 export type { OrderBook } from "./OrderBook";
 export type { OrderBookRewardDistributor } from "./OrderBookRewardDistributor";
+export type { MinimaRouter } from "./MinimaRouter";
 export type { AToken } from "./AToken";
 export type { LendingPool } from "./LendingPool";
 export type { LendingPoolCore } from "./LendingPoolCore";
@@ -29,6 +30,7 @@ export { IUniswapV2Router02__factory } from "./factories/IUniswapV2Router02__fac
 export { LimitOrderProtocol__factory } from "./factories/LimitOrderProtocol__factory";
 export { OrderBook__factory } from "./factories/OrderBook__factory";
 export { OrderBookRewardDistributor__factory } from "./factories/OrderBookRewardDistributor__factory";
+export { MinimaRouter__factory } from "./factories/MinimaRouter__factory";
 export { AToken__factory } from "./factories/AToken__factory";
 export { LendingPool__factory } from "./factories/LendingPool__factory";
 export { LendingPoolCore__factory } from "./factories/LendingPoolCore__factory";

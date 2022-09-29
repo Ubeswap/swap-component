@@ -1,6 +1,6 @@
 import { ChainId as UbeswapChainId, Token, TokenAmount } from '@ubeswap/sdk';
-import { UbeswapTrade } from 'components/swap/routing/trade';
 import { ParsedQs } from 'qs';
+import { MinimaRouterTrade, UbeswapTrade } from '../../components/swap/routing/trade';
 import { AppState } from '../index';
 import { Field } from './actions';
 import { SwapState } from './reducer';
@@ -20,7 +20,7 @@ export declare function useDerivedSwapInfo(): {
         [field in Field]?: TokenAmount;
     };
     parsedAmount: TokenAmount | undefined;
-    v2Trade: UbeswapTrade | undefined;
+    v2Trade: MinimaRouterTrade | UbeswapTrade | undefined;
     inputError?: string;
     showRamp: boolean;
 };

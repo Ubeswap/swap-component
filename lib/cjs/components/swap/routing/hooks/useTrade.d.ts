@@ -1,5 +1,5 @@
 import { Pair, Percent, Price, Token, TokenAmount, Trade } from '@ubeswap/sdk';
-import { UbeswapTrade } from '../trade';
+import { MinimaRouterTrade, UbeswapTrade } from '../trade';
 /**
  * Uses all common pairs between the two tokens, plus searches the moola duals
  * @param tokenA
@@ -40,3 +40,4 @@ export declare function useUbeswapTradeExactIn(tokenAmountIn?: TokenAmount, toke
  * Returns the best trade for the token in to the exact amount of token out
  */
 export declare function useUbeswapTradeExactOut(tokenIn?: Token, tokenAmountOut?: TokenAmount): UbeswapTrade | null;
+export declare function useMinimaTrade(tokenAmountIn?: TokenAmount, tokenOut?: Token): MinimaRouterTrade | null | undefined;

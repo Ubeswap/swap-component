@@ -21,7 +21,8 @@ interface CurrencyInputPanelProps {
     customBalanceText?: string;
     chainId?: ChainId;
     balanceOverride?: TokenAmount;
+    disabled?: boolean;
 }
 export default function CurrencyInputPanel({ value, onUserInput, onMax, onHalf, showMaxButton, showHalfButton, label, onCurrencySelect, currency, disableCurrencySelect, hideBalance, pair, // used for double token logo
-hideInput, otherCurrency, id, showCommonBases, customBalanceText, chainId, balanceOverride, }: CurrencyInputPanelProps): JSX.Element;
+hideInput, otherCurrency, id, showCommonBases, customBalanceText, chainId, balanceOverride, disabled, }: CurrencyInputPanelProps): JSX.Element;
 export {};

@@ -11,5 +11,5 @@ export interface LimitState {
     readonly recipient: string | null;
     readonly buying: boolean;
 }
-declare const _default: import("redux").Reducer<LimitState, import("redux").AnyAction>;
+declare const _default: import("@reduxjs/toolkit/dist/createReducer").ReducerWithInitialState<LimitState>;
 export default _default;

@@ -16,5 +16,5 @@ export interface MulticallState {
         };
     };
 }
-declare const _default: import("redux").Reducer<MulticallState, import("redux").AnyAction>;
+declare const _default: import("@reduxjs/toolkit/dist/createReducer").ReducerWithInitialState<MulticallState>;
 export default _default;

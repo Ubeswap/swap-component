@@ -29,5 +29,5 @@ export interface UserState {
     userAprMode: boolean;
 }
 export declare const initialState: UserState;
-declare const _default: import("redux").Reducer<UserState, import("redux").AnyAction>;
+declare const _default: import("@reduxjs/toolkit/dist/createReducer").ReducerWithInitialState<UserState>;
 export default _default;

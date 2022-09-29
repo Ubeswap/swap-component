@@ -21,5 +21,5 @@ export interface TransactionState {
     };
 }
 export declare const initialState: TransactionState;
-declare const _default: import("redux").Reducer<TransactionState, import("redux").AnyAction>;
+declare const _default: import("@reduxjs/toolkit/dist/createReducer").ReducerWithInitialState<TransactionState>;
 export default _default;

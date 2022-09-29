@@ -1,5 +1,5 @@
 import { Fraction, Token, TokenAmount } from '@ubeswap/sdk';
-import { UbeswapTrade } from 'components/swap/routing/trade';
+import { UbeswapTrade } from '../../components/swap/routing/trade';
 import { AppState } from '../index';
 import { Field } from './actions';
 export declare function useLimitOrderState(): AppState['limit'];

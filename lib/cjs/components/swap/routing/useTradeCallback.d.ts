@@ -1,5 +1,5 @@
 import { Trade } from '@ubeswap/sdk';
-import { SwapCallbackState } from 'hooks/useSwapCallback';
+import { SwapCallbackState } from '../../../hooks/useSwapCallback';
 /**
  * Use callback to allow trading
  * @param trade

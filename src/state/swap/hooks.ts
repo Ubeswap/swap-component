@@ -5,8 +5,12 @@ import { ParsedQs } from 'qs'
 import { useCallback, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { useUbeswapTradeExactIn, useUbeswapTradeExactOut } from '../../components/swap/routing/hooks/useTrade'
-import { UbeswapTrade } from '../../components/swap/routing/trade'
+import {
+  useMinimaTrade,
+  useUbeswapTradeExactIn,
+  useUbeswapTradeExactOut,
+} from '../../components/swap/routing/hooks/useTrade'
+import { MinimaRouterTrade, UbeswapTrade } from '../../components/swap/routing/trade'
 import { ROUTER_ADDRESS } from '../../constants'
 import { useCurrency } from '../../hooks/Tokens'
 import useENS from '../../hooks/useENS'
@@ -110,7 +114,7 @@ export function useDerivedSwapInfo(): {
   currencies: { [field in Field]?: Token }
   currencyBalances: { [field in Field]?: TokenAmount }
   parsedAmount: TokenAmount | undefined
-  v2Trade: UbeswapTrade | undefined
+  v2Trade: MinimaRouterTrade | UbeswapTrade | undefined
   inputError?: string
   showRamp: boolean
 } {
@@ -137,7 +141,10 @@ export function useDerivedSwapInfo(): {
   const isExactIn: boolean = independentField === Field.INPUT
   const parsedAmount = tryParseAmount(typedValue, (isExactIn ? inputCurrency : outputCurrency) ?? undefined)
 
-  const bestTradeExactIn = useUbeswapTradeExactIn(isExactIn ? parsedAmount : undefined, outputCurrency ?? undefined)
+  const minimaBestTradeExactIn = useMinimaTrade(isExactIn ? parsedAmount : undefined, outputCurrency ?? undefined)
+  const ubeBestTradeExactIn = useUbeswapTradeExactIn(isExactIn ? parsedAmount : undefined, outputCurrency ?? undefined)
+  const bestTradeExactIn =
+    minimaBestTradeExactIn === undefined ? undefined : minimaBestTradeExactIn ?? ubeBestTradeExactIn
   const bestTradeExactOut = useUbeswapTradeExactOut(inputCurrency ?? undefined, !isExactIn ? parsedAmount : undefined)
 
   const v2Trade = isExactIn ? bestTradeExactIn : bestTradeExactOut

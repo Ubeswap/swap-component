@@ -2,6 +2,7 @@ import { JSBI, Percent, Token } from '@ubeswap/sdk';
 export { UBE } from './tokens';
 export declare const ROUTER_ADDRESS = "0xE3D8bd6Aed4F159bc8000a9cD47CffDb95F96121";
 export declare const UBESWAP_MOOLA_ROUTER_ADDRESS = "0x7d28570135a2b1930f331c507f65039d4937f66c";
+export declare const MINIMA_ROUTER_ADDRESS = "0xa730B463395f5ca07EcE5cefeccF7f45e1E2C9Bf";
 export declare const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 declare type ChainTokenList = {
     readonly [chainId: number]: Token[];
@@ -79,3 +80,5 @@ export declare const BETTER_TRADE_LESS_HOPS_THRESHOLD: Percent;
 export declare const ZERO_PERCENT: Percent;
 export declare const ONE_HUNDRED_PERCENT: Percent;
 export declare const IMPORTED_FARMS = "imported_farms";
+export declare const MINIMA_API_URL = "https://router.nodefinance.org/routes";
+export declare const FETCH_MINIMA_ROUTER_TIMER = 5000;

@@ -10,5 +10,5 @@ export interface SwapState {
     };
     readonly recipient: string | null;
 }
-declare const _default: import("redux").Reducer<SwapState, import("redux").AnyAction>;
+declare const _default: import("@reduxjs/toolkit/dist/createReducer").ReducerWithInitialState<SwapState>;
 export default _default;

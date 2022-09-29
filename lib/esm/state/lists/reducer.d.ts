@@ -11,5 +11,5 @@ export interface ListsState {
     readonly lastInitializedDefaultListOfLists?: string[];
     readonly activeListUrls: string[] | undefined;
 }
-declare const _default: import("redux").Reducer<ListsState, import("redux").AnyAction>;
+declare const _default: import("@reduxjs/toolkit/dist/createReducer").ReducerWithInitialState<ListsState>;
 export default _default;

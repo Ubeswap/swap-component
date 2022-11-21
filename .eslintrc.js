@@ -9,7 +9,7 @@ module.exports = {
       jsx: true,
     },
   },
-  ignorePatterns: ['node_modules/**/*', 'craco.config.js'],
+  ignorePatterns: ['node_modules/**/*', 'craco.config.js', 'lib/**/*'],
   settings: {
     react: {
       version: 'detect',

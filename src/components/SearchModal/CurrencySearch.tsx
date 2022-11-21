@@ -1,5 +1,6 @@
 import { ChainId } from '@celo-tools/use-contractkit'
 import { ChainId as UbeswapChainId, cUSD, Token } from '@ubeswap/sdk'
+import { TokenInfo } from '@uniswap/token-lists'
 import React, { KeyboardEvent, RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Edit } from 'react-feather'
 import ReactGA from 'react-ga'
@@ -52,6 +53,7 @@ interface CurrencySearchProps {
   showImportView: () => void
   setImportToken: (token: Token) => void
   chainId?: ChainId
+  defaultTokenLists?: TokenInfo[]
 }
 
 export function CurrencySearch({
@@ -65,6 +67,7 @@ export function CurrencySearch({
   showImportView,
   setImportToken,
   chainId = ChainId.Mainnet,
+  defaultTokenLists,
 }: CurrencySearchProps) {
   const { t } = useTranslation()
   const theme = useTheme()
@@ -75,7 +78,7 @@ export function CurrencySearch({
   const [searchQuery, setSearchQuery] = useState<string>('')
   const [invertSearchOrder] = useState<boolean>(false)
 
-  const allTokens = useAllTokens(chainId)
+  const allTokens = useAllTokens(chainId, defaultTokenLists)
   // const inactiveTokens: Token[] | undefined = useFoundOnInactiveList(searchQuery)
 
   // if they input an address, use it
@@ -229,7 +232,7 @@ export function CurrencySearch({
       ) : filteredSortedTokens?.length > 0 || (showExpanded && inactiveTokens && inactiveTokens.length > 0) ? (
         <div style={{ flex: '1' }}>
           <AutoSizer disableWidth>
-            {({ height }) => (
+            {({ height }: { height: number }) => (
               <CurrencyList
                 height={height}
                 showETH={showETH}

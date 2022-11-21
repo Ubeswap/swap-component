@@ -1,6 +1,8 @@
 import { useContractKit } from '@celo-tools/use-contractkit'
 import { RampInstantSDK } from '@ramp-network/ramp-instant-sdk'
 import { CELO, ChainId as UbeswapChainId, JSBI, Token, TokenAmount, Trade } from '@ubeswap/sdk'
+import { TokenInfo } from '@uniswap/token-lists'
+import { BigNumberish } from 'ethers'
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { ArrowDown } from 'react-feather'
 import ReactGA from 'react-ga'
@@ -52,15 +54,18 @@ import { computeTradePriceBreakdown, warningSeverity } from '../../utils/prices'
 import AppBody from '../AppBody'
 
 interface Props {
-  useDarkMode: boolean
+  defaultSwapToken?: TokenInfo
+  defaultTokenLists?: TokenInfo[]
+  minimaPartnerId?: BigNumberish
+  useDarkMode?: boolean
 }
 
-export default function SwapBody({ useDarkMode }: Props) {
+export default function SwapBody({ defaultSwapToken, defaultTokenLists, minimaPartnerId, useDarkMode }: Props) {
   const dispatch = useDispatch<AppDispatch>()
   dispatch(updateUserDarkMode({ userDarkMode: useDarkMode ?? false }))
 
   const { t } = useTranslation()
-  const loadedUrlParams = useDefaultsFromURLSearch()
+  const loadedUrlParams = useDefaultsFromURLSearch(defaultSwapToken?.address)
 
   // token warning stuff
   const [loadedInputCurrency, loadedOutputCurrency] = [
@@ -108,7 +113,7 @@ export default function SwapBody({ useDarkMode }: Props) {
     currencies,
     inputError: swapInputError,
     showRamp,
-  } = useDerivedSwapInfo()
+  } = useDerivedSwapInfo(minimaPartnerId)
   const { address: recipientAddress } = useENS(recipient)
   const trade = v2Trade
 
@@ -341,6 +346,8 @@ export default function SwapBody({ useDarkMode }: Props) {
               onHalf={handleHalfInput}
               onCurrencySelect={handleInputSelect}
               otherCurrency={currencies[Field.OUTPUT]}
+              defaultTokenLists={defaultTokenLists}
+              disableCurrencySelect={defaultSwapToken && currencies[Field.INPUT]?.address === defaultSwapToken.address}
               id="swap-currency-input"
             />
             <AutoColumn justify="space-between">
@@ -372,7 +379,10 @@ export default function SwapBody({ useDarkMode }: Props) {
               currency={currencies[Field.OUTPUT]}
               onCurrencySelect={handleOutputSelect}
               otherCurrency={currencies[Field.INPUT]}
+              defaultTokenLists={defaultTokenLists}
               id="swap-currency-output"
+              disableCurrencySelect={defaultSwapToken && currencies[Field.OUTPUT]?.address === defaultSwapToken.address}
+              disabled
             />
 
             {recipient !== null ? (

@@ -8,9 +8,14 @@ import { useAllTokens } from '../../hooks/Tokens'
 import { useTokenBalances } from '../../state/wallet/hooks'
 import { ExternalLink, TYPE } from '../../theme'
 import { AutoColumn, TopSection } from '../Column'
-import { CardSection } from '../earn/styled'
 import { RowBetween, RowStart } from '../Row'
 import { filterTokens } from '../SearchModal/filtering'
+
+export const CardSection = styled(AutoColumn)<{ disabled?: boolean }>`
+  padding: 1rem;
+  z-index: 1;
+  opacity: ${({ disabled }) => disabled && '0.4'};
+`
 
 const WarningCard = styled(AutoColumn)<{ disabled?: boolean }>`
   background-color: ${(props) => props.theme.bg1};

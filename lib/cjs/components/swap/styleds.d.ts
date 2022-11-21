@@ -16,6 +16,6 @@ export declare function SwapCallbackError({ error }: {
 }): JSX.Element;
 export declare const SwapShowAcceptChanges: import("styled-components").StyledComponent<"div", import("styled-components").DefaultTheme, {
     gap?: string | undefined;
-    justify?: "end" | "start" | "center" | "stretch" | "flex-start" | "flex-end" | "space-between" | undefined;
+    justify?: "end" | "start" | "center" | "flex-end" | "flex-start" | "stretch" | "space-between" | undefined;
 }, never>;
 export declare const Separator: import("styled-components").StyledComponent<"div", import("styled-components").DefaultTheme, {}, never>;

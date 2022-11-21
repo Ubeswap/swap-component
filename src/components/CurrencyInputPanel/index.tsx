@@ -1,5 +1,6 @@
 import { ChainId, useContractKit } from '@celo-tools/use-contractkit'
 import { Pair, Token, TokenAmount } from '@ubeswap/sdk'
+import { TokenInfo } from '@uniswap/token-lists'
 import { darken } from 'polished'
 import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -118,6 +119,7 @@ interface CurrencyInputPanelProps {
   chainId?: ChainId
   balanceOverride?: TokenAmount
   disabled?: boolean
+  defaultTokenLists?: TokenInfo[]
 }
 
 export default function CurrencyInputPanel({
@@ -141,9 +143,9 @@ export default function CurrencyInputPanel({
   chainId,
   balanceOverride,
   disabled = false,
+  defaultTokenLists,
 }: CurrencyInputPanelProps) {
   const { t } = useTranslation()
-
   const [modalOpen, setModalOpen] = useState(false)
   const { address: account } = useContractKit()
 
@@ -163,6 +165,7 @@ export default function CurrencyInputPanel({
             <RowBetween>
               <CurrencySelect
                 selected={!!currency}
+                disableCurrencySelect={disableCurrencySelect}
                 className="open-currency-select-button"
                 onClick={() => {
                   if (!disableCurrencySelect) {
@@ -238,6 +241,7 @@ export default function CurrencyInputPanel({
           otherSelectedCurrency={otherCurrency}
           showCommonBases={showCommonBases}
           chainId={chainId}
+          defaultTokenLists={defaultTokenLists}
         />
       )}
     </InputPanel>

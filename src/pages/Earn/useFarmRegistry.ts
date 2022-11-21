@@ -5,7 +5,7 @@ import { formatEther, parseEther } from '@ethersproject/units'
 import { Percent, TokenAmount } from '@ubeswap/sdk'
 import { ethers } from 'ethers'
 import React, { useEffect } from 'react'
-import { AbiItem } from 'web3-utils'
+import { AbiItem } from 'web3-eth-abi/node_modules/web3-utils'
 
 import farmRegistryAbi from '../../constants/abis/FarmRegistry.json'
 

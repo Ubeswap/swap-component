@@ -142,10 +142,14 @@ export function useInactiveListUrls(): string[] {
 }
 
 // get all the tokens from active lists, combine with local default tokens
-export function useCombinedActiveList(): TokenAddressMap {
+export function useCombinedActiveList(defaultTokenLists?: TokenInfo[]): TokenAddressMap {
   const activeListUrls = useActiveListUrls()
-  const activeTokens = useCombinedTokenMapFromUrls(activeListUrls)
-  const defaultTokenMap = listToTokenMap({ ...UBESWAP_TOKEN_LIST, ...UNISWAP_TOKEN_LIST })
+  const activeTokens = useCombinedTokenMapFromUrls(defaultTokenLists ? undefined : activeListUrls)
+  const defaultTokenMap = listToTokenMap(
+    defaultTokenLists
+      ? { ...UBESWAP_TOKEN_LIST, tokens: defaultTokenLists }
+      : { ...UBESWAP_TOKEN_LIST, ...UNISWAP_TOKEN_LIST }
+  )
   return combineMaps(activeTokens, defaultTokenMap)
 }
 

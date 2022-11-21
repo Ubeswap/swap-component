@@ -1,6 +1,7 @@
 /// <reference types="react" />
 import { ChainId } from '@celo-tools/use-contractkit';
 import { Token } from '@ubeswap/sdk';
+import { TokenInfo } from '@uniswap/token-lists';
 interface CurrencySearchProps {
     isOpen: boolean;
     onDismiss: () => void;
@@ -12,6 +13,7 @@ interface CurrencySearchProps {
     showImportView: () => void;
     setImportToken: (token: Token) => void;
     chainId?: ChainId;
+    defaultTokenLists?: TokenInfo[];
 }
-export declare function CurrencySearch({ selectedCurrency, onCurrencySelect, otherSelectedCurrency, showCommonBases, onDismiss, isOpen, showManageView, showImportView, setImportToken, chainId, }: CurrencySearchProps): JSX.Element;
+export declare function CurrencySearch({ selectedCurrency, onCurrencySelect, otherSelectedCurrency, showCommonBases, onDismiss, isOpen, showManageView, showImportView, setImportToken, chainId, defaultTokenLists, }: CurrencySearchProps): JSX.Element;
 export {};

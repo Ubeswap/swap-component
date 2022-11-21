@@ -20,7 +20,7 @@ function useAllCommonPairs(tokenA?: Token, tokenB?: Token): Pair[] {
   }, [chainId])
 
   const basePairs: [Token, Token][] = useMemo(
-    () => flatMap(bases, (base): [Token, Token][] => bases.map((otherBase) => [base, otherBase])),
+    () => flatMap(bases, (base: any): [Token, Token][] => bases.map((otherBase) => [base, otherBase])),
     [bases]
   )
 

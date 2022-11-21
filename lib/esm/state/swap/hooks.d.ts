@@ -1,4 +1,5 @@
 import { ChainId as UbeswapChainId, Token, TokenAmount } from '@ubeswap/sdk';
+import { BigNumberish } from 'ethers';
 import { ParsedQs } from 'qs';
 import { MinimaRouterTrade, UbeswapTrade } from '../../components/swap/routing/trade';
 import { AppState } from '../index';
@@ -12,7 +13,7 @@ export declare function useSwapActionHandlers(): {
     onChangeRecipient: (recipient: string | null) => void;
 };
 export declare function tryParseAmount(value?: string, currency?: Token): TokenAmount | undefined;
-export declare function useDerivedSwapInfo(): {
+export declare function useDerivedSwapInfo(minimaPartnerId?: BigNumberish): {
     currencies: {
         [field in Field]?: Token;
     };
@@ -25,7 +26,7 @@ export declare function useDerivedSwapInfo(): {
     showRamp: boolean;
 };
 export declare function queryParametersToSwapState(parsedQs: ParsedQs, chainId: UbeswapChainId): SwapState;
-export declare function useDefaultsFromURLSearch(): {
+export declare function useDefaultsFromURLSearch(defaultSwapToken?: string): {
     inputCurrencyId: string | undefined;
     outputCurrencyId: string | undefined;
 } | undefined;

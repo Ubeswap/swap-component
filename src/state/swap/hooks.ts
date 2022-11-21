@@ -1,6 +1,7 @@
 import { useContractKit } from '@celo-tools/use-contractkit'
 import { parseUnits } from '@ethersproject/units'
 import { CELO, cEUR, ChainId as UbeswapChainId, cUSD, JSBI, Token, TokenAmount, Trade } from '@ubeswap/sdk'
+import { BigNumberish } from 'ethers'
 import { ParsedQs } from 'qs'
 import { useCallback, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -110,7 +111,7 @@ function involvesAddress(trade: Trade, checksummedAddress: string): boolean {
 }
 
 // from the current swap inputs, compute the best trade and return it.
-export function useDerivedSwapInfo(): {
+export function useDerivedSwapInfo(minimaPartnerId?: BigNumberish): {
   currencies: { [field in Field]?: Token }
   currencyBalances: { [field in Field]?: TokenAmount }
   parsedAmount: TokenAmount | undefined
@@ -141,7 +142,11 @@ export function useDerivedSwapInfo(): {
   const isExactIn: boolean = independentField === Field.INPUT
   const parsedAmount = tryParseAmount(typedValue, (isExactIn ? inputCurrency : outputCurrency) ?? undefined)
 
-  const minimaBestTradeExactIn = useMinimaTrade(isExactIn ? parsedAmount : undefined, outputCurrency ?? undefined)
+  const minimaBestTradeExactIn = useMinimaTrade(
+    isExactIn ? parsedAmount : undefined,
+    outputCurrency ?? undefined,
+    minimaPartnerId
+  )
   const ubeBestTradeExactIn = useUbeswapTradeExactIn(isExactIn ? parsedAmount : undefined, outputCurrency ?? undefined)
   const bestTradeExactIn =
     minimaBestTradeExactIn === undefined ? undefined : minimaBestTradeExactIn ?? ubeBestTradeExactIn
@@ -273,9 +278,9 @@ export function queryParametersToSwapState(parsedQs: ParsedQs, chainId: UbeswapC
 }
 
 // updates the swap state to use the defaults for a given network
-export function useDefaultsFromURLSearch():
-  | { inputCurrencyId: string | undefined; outputCurrencyId: string | undefined }
-  | undefined {
+export function useDefaultsFromURLSearch(
+  defaultSwapToken?: string
+): { inputCurrencyId: string | undefined; outputCurrencyId: string | undefined } | undefined {
   const { network } = useContractKit()
   const chainId = network.chainId as unknown as UbeswapChainId
   const dispatch = useDispatch<AppDispatch>()
@@ -292,7 +297,7 @@ export function useDefaultsFromURLSearch():
       replaceSwapState({
         typedValue: parsed.typedValue,
         field: parsed.independentField,
-        inputCurrencyId: parsed[Field.INPUT].currencyId,
+        inputCurrencyId: isAddress(defaultSwapToken) ? defaultSwapToken : parsed[Field.INPUT].currencyId,
         outputCurrencyId: parsed[Field.OUTPUT].currencyId,
         recipient: parsed.recipient,
       })

@@ -40,4 +40,8 @@ module.exports = {
     enable: false,
   },
   typescript: { enableTypeChecking: false },
+  loaders: [
+    { test: /\.json$/, loader: 'json-loader' },
+    // other loaders 
+  ]
 }

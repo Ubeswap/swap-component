@@ -1,9 +1,10 @@
 import { ChainId } from '@celo-tools/use-contractkit';
 import { Token } from '@ubeswap/sdk';
+import { TokenInfo } from '@uniswap/token-lists';
 export declare function useDefaultTokens(): {
     [address: string]: Token;
 };
-export declare function useAllTokens(chainId?: ChainId): {
+export declare function useAllTokens(chainId?: ChainId, defaultTokenLists?: TokenInfo[]): {
     [address: string]: Token;
 };
 export declare function useAllInactiveTokens(): {

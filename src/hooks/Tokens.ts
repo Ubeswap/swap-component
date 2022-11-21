@@ -1,6 +1,7 @@
 import { ChainId, useContractKit } from '@celo-tools/use-contractkit'
 import { parseBytes32String } from '@ethersproject/strings'
 import { currencyEquals, Token } from '@ubeswap/sdk'
+import { TokenInfo } from '@uniswap/token-lists'
 import { arrayify } from 'ethers/lib/utils'
 import { useMemo } from 'react'
 
@@ -56,8 +57,8 @@ export function useDefaultTokens(): { [address: string]: Token } {
   return useTokensFromMap(defaultList, false)
 }
 
-export function useAllTokens(chainId?: ChainId): { [address: string]: Token } {
-  const allTokens = useCombinedActiveList()
+export function useAllTokens(chainId?: ChainId, defaultTokenLists?: TokenInfo[]): { [address: string]: Token } {
+  const allTokens = useCombinedActiveList(defaultTokenLists)
   return useTokensFromMap(allTokens, true, chainId)
 }
 

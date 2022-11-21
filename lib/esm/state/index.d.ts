@@ -1,4 +1,4 @@
-declare const store: import("@reduxjs/toolkit").EnhancedStore<{
+declare const store: import("@reduxjs/toolkit/dist/configureStore").ToolkitStore<{
     application: import("./application/reducer").ApplicationState;
     user: import("./user/reducer").UserState;
     transactions: import("./transactions/reducer").TransactionState;

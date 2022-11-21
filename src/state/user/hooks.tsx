@@ -72,7 +72,9 @@ export function useDarkModeManager(): [boolean, () => void] {
 }
 
 export function useIsExpertMode(): boolean {
-  return useSelector<AppState, AppState['user']['userExpertMode']>((state) => state.user.userExpertMode)
+  return useSelector<AppState, AppState['user']['userExpertMode']>(
+    (state: { user: { userExpertMode: any } }) => state.user.userExpertMode
+  )
 }
 
 export function useExpertModeManager(): [boolean, () => void] {
@@ -88,7 +90,9 @@ export function useExpertModeManager(): [boolean, () => void] {
 
 export function useUserMinApprove(): [boolean, (minApprove: boolean) => void] {
   const dispatch = useDispatch<AppDispatch>()
-  const minApprove = useSelector<AppState, AppState['user']['userMinApprove']>((state) => state.user.userMinApprove)
+  const minApprove = useSelector<AppState, AppState['user']['userMinApprove']>(
+    (state: { user: { userMinApprove: any } }) => state.user.userMinApprove
+  )
   const setMinApprove = useCallback(
     (newMinApprove: boolean) => {
       dispatch(updateUserMinApprove({ userMinApprove: newMinApprove }))
@@ -101,7 +105,7 @@ export function useUserMinApprove(): [boolean, (minApprove: boolean) => void] {
 export function useUserAllowMoolaWithdrawal(): [boolean, (allowMoolaWithdrawal: boolean) => void] {
   const dispatch = useDispatch<AppDispatch>()
   const allowMoolaWithdrawal = useSelector<AppState, AppState['user']['userAllowMoolaWithdrawal']>(
-    (state) => state.user.userAllowMoolaWithdrawal
+    (state: { user: { userAllowMoolaWithdrawal: any } }) => state.user.userAllowMoolaWithdrawal
   )
   const setAllowMoolaWithdrawal = useCallback(
     (newallowMoolaWithdrawal: boolean) => {
@@ -115,7 +119,7 @@ export function useUserAllowMoolaWithdrawal(): [boolean, (allowMoolaWithdrawal: 
 export function useUserDisableSmartRouting(): [boolean, (disableSmartRouting: boolean) => void] {
   const dispatch = useDispatch<AppDispatch>()
   const disableSmartRouting = useSelector<AppState, AppState['user']['userDisableSmartRouting']>(
-    (state) => state.user.userDisableSmartRouting
+    (state: { user: { userDisableSmartRouting: any } }) => state.user.userDisableSmartRouting
   )
   const setDisableSmartRouting = useCallback(
     (newSmartRouting: boolean) => {
@@ -130,7 +134,7 @@ export function useUserSingleHopOnly(): [boolean, (newSingleHopOnly: boolean) =>
   const dispatch = useDispatch<AppDispatch>()
 
   const singleHopOnly = useSelector<AppState, AppState['user']['userSingleHopOnly']>(
-    (state) => state.user.userSingleHopOnly
+    (state: { user: { userSingleHopOnly: any } }) => state.user.userSingleHopOnly
   )
 
   const setSingleHopOnly = useCallback(
@@ -149,9 +153,11 @@ export function useUserSingleHopOnly(): [boolean, (newSingleHopOnly: boolean) =>
 
 export function useUserSlippageTolerance(): [number, (slippage: number) => void] {
   const dispatch = useDispatch<AppDispatch>()
-  const userSlippageTolerance = useSelector<AppState, AppState['user']['userSlippageTolerance']>((state) => {
-    return state.user.userSlippageTolerance
-  })
+  const userSlippageTolerance = useSelector<AppState, AppState['user']['userSlippageTolerance']>(
+    (state: { user: { userSlippageTolerance: any } }) => {
+      return state.user.userSlippageTolerance
+    }
+  )
 
   const setUserSlippageTolerance = useCallback(
     (userSlippageTolerance: number) => {
@@ -165,9 +171,11 @@ export function useUserSlippageTolerance(): [number, (slippage: number) => void]
 
 export function useUserTransactionTTL(): [number, (slippage: number) => void] {
   const dispatch = useDispatch<AppDispatch>()
-  const userDeadline = useSelector<AppState, AppState['user']['userDeadline']>((state) => {
-    return state.user.userDeadline
-  })
+  const userDeadline = useSelector<AppState, AppState['user']['userDeadline']>(
+    (state: { user: { userDeadline: any } }) => {
+      return state.user.userDeadline
+    }
+  )
 
   const setUserDeadline = useCallback(
     (userDeadline: number) => {
@@ -255,13 +263,13 @@ export function useTrackedTokenPairs(): [Token, Token][] {
   const tokens = useAllTokens()
 
   // pinned pairs
-  const pinnedPairs = useMemo(() => (chainId ? PINNED_PAIRS[chainId] ?? [] : []), [chainId])
+  const pinnedPairs: [Token, Token][] = useMemo(() => (chainId ? PINNED_PAIRS[chainId] ?? [] : []), [chainId])
 
   // pairs for every token against every base
   const generatedPairs: [Token, Token][] = useMemo(
     () =>
       chainId
-        ? flatMap(Object.keys(tokens), (tokenAddress) => {
+        ? flatMap(Object.keys(tokens), (tokenAddress: string | number) => {
             const token = tokens[tokenAddress]
             // for each token on the current chain,
             return (
@@ -295,7 +303,7 @@ export function useTrackedTokenPairs(): [Token, Token][] {
     })
   }, [savedSerializedPairs, chainId])
 
-  const combinedList = useMemo(
+  const combinedList: [Token, Token][] = useMemo(
     () => userPairs.concat(generatedPairs).concat(pinnedPairs),
     [generatedPairs, pinnedPairs, userPairs]
   )
@@ -315,5 +323,7 @@ export function useTrackedTokenPairs(): [Token, Token][] {
 }
 
 export function useIsAprMode(): boolean {
-  return useSelector<AppState, AppState['user']['userAprMode']>((state) => state.user.userAprMode)
+  return useSelector<AppState, AppState['user']['userAprMode']>(
+    (state: { user: { userAprMode: any } }) => state.user.userAprMode
+  )
 }

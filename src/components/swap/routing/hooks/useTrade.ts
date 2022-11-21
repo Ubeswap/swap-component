@@ -1,6 +1,6 @@
 import { ChainId, useContractKit, useProvider } from '@celo-tools/use-contractkit'
 import { currencyEquals, JSBI, Pair, Percent, Price, Token, TokenAmount, Trade, TradeType } from '@ubeswap/sdk'
-import { BigNumber, ContractInterface, ethers } from 'ethers'
+import { BigNumber, BigNumberish, ContractInterface, ethers } from 'ethers'
 import _ from 'lodash'
 import flatMap from 'lodash.flatmap'
 import React, { useMemo } from 'react'
@@ -43,8 +43,8 @@ export function useAllCommonPairsWithMoolaDuals(tokenA?: Token, tokenB?: Token):
 
   const basePairs: readonly (readonly [Token, Token])[] = useMemo(
     () =>
-      flatMap(bases, (base): [Token, Token][] => bases.map((otherBase) => [base, otherBase])).filter(
-        ([t0, t1]) =>
+      flatMap(bases, (base: any): [Token, Token][] => bases.map((otherBase) => [base, otherBase])).filter(
+        ([t0, t1]: Token[]) =>
           t0.address !== t1.address &&
           // ensure we don't fetch duals
           t0.address !== getMoolaDual(t1)?.address &&
@@ -318,7 +318,11 @@ interface Dependencies {
   inputAmount: string | undefined
 }
 
-export function useMinimaTrade(tokenAmountIn?: TokenAmount, tokenOut?: Token): MinimaRouterTrade | null | undefined {
+export function useMinimaTrade(
+  tokenAmountIn?: TokenAmount,
+  tokenOut?: Token,
+  minimaPartnerId?: BigNumberish
+): MinimaRouterTrade | null | undefined {
   const [minimaTrade, setMinimaTrade] = React.useState<MinimaRouterTrade | null | undefined>(undefined)
   const [deps, setDeps] = React.useState<Dependencies | undefined>(undefined)
   const [singleHopOnly] = useUserSingleHopOnly()
@@ -414,6 +418,7 @@ export function useMinimaTrade(tokenAmountIn?: TokenAmount, tokenOut?: Token): M
                   minOutputAmount: BigNumber.from(data.minimumExpectedOut ?? '0'),
                   expectedOutputAmount: BigNumber.from(data.details.expectedOutputAmount),
                   deadline: BigNumber.from(data.details.deadline),
+                  partner: minimaPartnerId ?? data.details.partner,
                 }
               )
               setMinimaTrade(trade)

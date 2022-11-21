@@ -4,7 +4,9 @@ import '@celo-tools/use-contractkit/lib/styles.css'
 import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client'
 import { ContractKitProvider } from '@celo-tools/use-contractkit'
 import { ErrorBoundary } from '@sentry/react'
-import React, { Suspense } from 'react'
+import { TokenInfo } from '@uniswap/token-lists'
+import { BigNumberish } from 'ethers'
+import React, { Suspense, useEffect, useState } from 'react'
 import ReactGA from 'react-ga'
 import { Provider } from 'react-redux'
 import { HashRouter, Route } from 'react-router-dom'
@@ -21,7 +23,7 @@ import ListsUpdater from '../state/lists/updater'
 import MulticallUpdater from '../state/multicall/updater'
 import TransactionUpdater from '../state/transactions/updater'
 import UserUpdater from '../state/user/updater'
-import ThemeProvider, { FixedGlobalStyle } from '../theme'
+import ThemeProvider, { FixedGlobalStyle, ThemedGlobalStyle } from '../theme'
 import DarkModeQueryParamReader from '../theme/DarkModeQueryParamReader'
 import SwapBody from './SwapBody'
 
@@ -114,8 +116,10 @@ function Updaters() {
 const Marginer = styled.div`
   margin-top: 5rem;
 `
-
 interface Props {
+  defaultSwapToken?: TokenInfo
+  tokenLists?: TokenInfo[][]
+  minimaPartnerId?: BigNumberish
   useDarkMode?: boolean
 }
 
@@ -127,7 +131,21 @@ const BodyWrapper = styled.div`
   width: 100%;
 `
 
-export default function Swap({ useDarkMode }: Props) {
+export default function Swap({ defaultSwapToken, tokenLists, minimaPartnerId, useDarkMode }: Props) {
+  const [defaultTokenLists, setDefaultTokenLists] = useState<TokenInfo[] | undefined>([])
+
+  useEffect(() => {
+    const allTokens = tokenLists?.reduce((prevList: TokenInfo[], curList: TokenInfo[]) => [...prevList, ...curList], [])
+    const uniqueTokens = allTokens?.filter((token, i) => {
+      const duplicatedToken = allTokens.find(
+        (_token) => token.chainId === _token.chainId && token.address === _token.address
+      )
+      const indexOfDuplicatedToken = duplicatedToken ? allTokens.indexOf(duplicatedToken) : -1
+      return i == indexOfDuplicatedToken
+    })
+    setDefaultTokenLists(uniqueTokens)
+  }, [tokenLists])
+
   return (
     <>
       <FixedGlobalStyle />
@@ -168,7 +186,7 @@ export default function Swap({ useDarkMode }: Props) {
           <ApolloProvider client={client}>
             <Updaters />
             <ThemeProvider>
-              {/* <ThemedGlobalStyle /> */}
+              <ThemedGlobalStyle />
               <HashRouter>
                 <Suspense fallback={null}>
                   <Route component={GoogleAnalyticsReporter} />
@@ -180,7 +198,12 @@ export default function Swap({ useDarkMode }: Props) {
                     <ErrorBoundary
                       fallback={<p>An unexpected error occured on this part of the page. Please reload.</p>}
                     >
-                      <SwapBody useDarkMode={useDarkMode ?? false} />
+                      <SwapBody
+                        defaultSwapToken={defaultSwapToken}
+                        defaultTokenLists={defaultTokenLists}
+                        minimaPartnerId={minimaPartnerId}
+                        useDarkMode={useDarkMode ?? false}
+                      />
                     </ErrorBoundary>
                     <Marginer />
                   </BodyWrapper>

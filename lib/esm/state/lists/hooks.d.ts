@@ -32,7 +32,7 @@ export declare function useAllLists(): {
 };
 export declare function useActiveListUrls(): string[] | undefined;
 export declare function useInactiveListUrls(): string[];
-export declare function useCombinedActiveList(): TokenAddressMap;
+export declare function useCombinedActiveList(defaultTokenLists?: TokenInfo[]): TokenAddressMap;
 export declare function useCombinedInactiveList(): TokenAddressMap;
 export declare function useDefaultTokenList(): TokenAddressMap;
 export declare function useUnsupportedTokenList(): TokenAddressMap;

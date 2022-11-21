@@ -82,3 +82,4 @@ export declare const ONE_HUNDRED_PERCENT: Percent;
 export declare const IMPORTED_FARMS = "imported_farms";
 export declare const MINIMA_API_URL = "https://router.nodefinance.org/routes";
 export declare const FETCH_MINIMA_ROUTER_TIMER = 5000;
+export declare const DEXES_TO_EXCLUDE: string[];

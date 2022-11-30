@@ -11,6 +11,7 @@ const StyledSwapHeader = styled.div`
   width: 100%;
   max-width: 420px;
   color: ${({ theme }) => theme.text2};
+  box-sizing: border-box;
 `
 
 export default function SwapHeader({

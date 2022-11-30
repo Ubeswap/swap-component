@@ -23,7 +23,7 @@ import ListsUpdater from '../state/lists/updater'
 import MulticallUpdater from '../state/multicall/updater'
 import TransactionUpdater from '../state/transactions/updater'
 import UserUpdater from '../state/user/updater'
-import ThemeProvider, { FixedGlobalStyle, ThemedGlobalStyle } from '../theme'
+import ThemeProvider, { ThemedGlobalStyle } from '../theme'
 import DarkModeQueryParamReader from '../theme/DarkModeQueryParamReader'
 import SwapBody from './SwapBody'
 
@@ -148,7 +148,7 @@ export default function Swap({ defaultSwapToken, tokenLists, minimaPartnerId, us
 
   return (
     <>
-      <FixedGlobalStyle />
+      {/* <FixedGlobalStyle /> */}
       {/* TODO: Mainnet, not alfajores */}
       <ContractKitProvider
         dapp={{

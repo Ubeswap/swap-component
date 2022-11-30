@@ -74,6 +74,7 @@ const OptionCustom = styled(FancyButton)<{ active?: boolean; warning?: boolean }
     height: 100%;
     border: 0px;
     border-radius: 2rem;
+    box-sizing: border-box;
   }
 `
 

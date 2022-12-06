@@ -21,10 +21,16 @@ function App() {
 }
 ```
 
-### Dark Mode Usage
+### Specify Custom Theme
 
 ```jsx
-<Swap useDarkMode />
+<Swap
+  theme={{
+    fontFamily: "'Inter', sans-serif",
+    primaryColor: '#00b0ff',
+    userDarkMode: false,
+  }}
+/>
 ```
 
 ### Specify Partner Id

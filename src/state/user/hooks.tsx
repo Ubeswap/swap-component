@@ -7,6 +7,7 @@ import { shallowEqual, useDispatch, useSelector } from 'react-redux'
 
 import { BASES_TO_TRACK_LIQUIDITY_FOR, PINNED_PAIRS } from '../../constants'
 import { useAllTokens } from '../../hooks/Tokens'
+import { SwapTheme } from '../../pages/Swap'
 import { AppDispatch, AppState } from '../index'
 import {
   addSerializedPair,
@@ -16,7 +17,6 @@ import {
   SerializedToken,
   toggleURLWarning,
   updateUserAllowMoolaWithdrawal,
-  updateUserDarkMode,
   updateUserDeadline,
   updateUserDisableSmartRouting,
   updateUserExpertMode,
@@ -45,30 +45,15 @@ function deserializeToken(serializedToken: SerializedToken): Token {
   )
 }
 
-export function useIsDarkMode(): boolean {
-  const { userDarkMode, matchesDarkMode } = useSelector<
-    AppState,
-    { userDarkMode: boolean | null; matchesDarkMode: boolean }
-  >(
-    ({ user: { matchesDarkMode, userDarkMode } }) => ({
-      userDarkMode,
-      matchesDarkMode,
+export function useSwapTheme(): SwapTheme | null {
+  const { theme } = useSelector<AppState, { theme: SwapTheme | null }>(
+    ({ user: { theme } }) => ({
+      theme,
     }),
     shallowEqual
   )
 
-  return userDarkMode === null ? matchesDarkMode : userDarkMode
-}
-
-export function useDarkModeManager(): [boolean, () => void] {
-  const dispatch = useDispatch<AppDispatch>()
-  const darkMode = useIsDarkMode()
-
-  const toggleSetDarkMode = useCallback(() => {
-    dispatch(updateUserDarkMode({ userDarkMode: !darkMode }))
-  }, [darkMode, dispatch])
-
-  return [darkMode, toggleSetDarkMode]
+  return theme
 }
 
 export function useIsExpertMode(): boolean {

@@ -116,22 +116,31 @@ function Updaters() {
 const Marginer = styled.div`
   margin-top: 5rem;
 `
+
+export interface SwapTheme {
+  fontFamily?: string
+  primaryColor?: string
+  userDarkMode?: boolean
+}
+
 interface Props {
+  theme?: SwapTheme
   defaultSwapToken?: TokenInfo
   tokenLists?: TokenInfo[][]
   minimaPartnerId?: BigNumberish
-  useDarkMode?: boolean
 }
 
-const BodyWrapper = styled.div`
+const BodyWrapper = styled.div<{ color?: string; fontFamily?: string }>`
   display: flex;
   align-items: center;
   flex-direction: column;
   max-width: 420px;
   width: 100%;
+  color: ${({ color }) => (color ? color : 'unset')};
+  font-family: ${({ fontFamily }) => (fontFamily ? fontFamily : 'unset')};
 `
 
-export default function Swap({ defaultSwapToken, tokenLists, minimaPartnerId, useDarkMode }: Props) {
+export default function Swap({ theme, defaultSwapToken, tokenLists, minimaPartnerId }: Props) {
   const [defaultTokenLists, setDefaultTokenLists] = useState<TokenInfo[] | undefined>([])
 
   useEffect(() => {
@@ -192,17 +201,17 @@ export default function Swap({ defaultSwapToken, tokenLists, minimaPartnerId, us
                   <Route component={GoogleAnalyticsReporter} />
                   <Route component={DarkModeQueryParamReader} />
                   <URLWarning />
-                  <BodyWrapper>
+                  <BodyWrapper fontFamily={theme?.fontFamily}>
                     <Popups />
                     <Polling />
                     <ErrorBoundary
                       fallback={<p>An unexpected error occured on this part of the page. Please reload.</p>}
                     >
                       <SwapBody
+                        theme={theme}
                         defaultSwapToken={defaultSwapToken}
                         defaultTokenLists={defaultTokenLists}
                         minimaPartnerId={minimaPartnerId}
-                        useDarkMode={useDarkMode ?? false}
                       />
                     </ErrorBoundary>
                     <Marginer />

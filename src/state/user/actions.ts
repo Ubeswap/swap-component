@@ -1,5 +1,7 @@
 import { createAction } from '@reduxjs/toolkit'
 
+import { SwapTheme } from '../../pages/Swap'
+
 export interface SerializedToken {
   chainId: number
   address: string
@@ -14,7 +16,7 @@ export interface SerializedPair {
 }
 
 export const updateMatchesDarkMode = createAction<{ matchesDarkMode: boolean }>('user/updateMatchesDarkMode')
-export const updateUserDarkMode = createAction<{ userDarkMode: boolean }>('user/updateUserDarkMode')
+export const updateTheme = createAction<{ theme: SwapTheme | undefined }>('user/updateTheme')
 export const updateUserExpertMode = createAction<{ userExpertMode: boolean }>('user/updateUserExpertMode')
 export const updateUserSingleHopOnly = createAction<{ userSingleHopOnly: boolean }>('user/updateUserSingleHopOnly')
 export const updateUserMinApprove = createAction<{ userMinApprove: boolean }>('user/updateUserMinApprove')
@@ -31,8 +33,9 @@ export const updateUserDeadline = createAction<{ userDeadline: number }>('user/u
 export const addSerializedToken = createAction<{ serializedToken: SerializedToken }>('user/addSerializedToken')
 export const removeSerializedToken = createAction<{ chainId: number; address: string }>('user/removeSerializedToken')
 export const addSerializedPair = createAction<{ serializedPair: SerializedPair }>('user/addSerializedPair')
-export const removeSerializedPair =
-  createAction<{ chainId: number; tokenAAddress: string; tokenBAddress: string }>('user/removeSerializedPair')
+export const removeSerializedPair = createAction<{ chainId: number; tokenAAddress: string; tokenBAddress: string }>(
+  'user/removeSerializedPair'
+)
 export const toggleURLWarning = createAction<void>('app/toggleURLWarning')
 
 export const setValoraAccount = createAction<{ address: string; phoneNumber: string }>('user/setValoraAccount')

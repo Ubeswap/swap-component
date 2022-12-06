@@ -62,7 +62,7 @@ export declare const PINNED_PAIRS: {
     [chainId: number]: [Token, Token][];
 };
 export declare const NetworkContextName = "NETWORK";
-export declare const INITIAL_ALLOWED_SLIPPAGE = 50;
+export declare const INITIAL_ALLOWED_SLIPPAGE = 100;
 export declare const DEFAULT_DEADLINE_FROM_NOW: number;
 export declare const BIG_INT_SECONDS_IN_WEEK: JSBI;
 export declare const INT_SECONDS_IN_WEEK: number;

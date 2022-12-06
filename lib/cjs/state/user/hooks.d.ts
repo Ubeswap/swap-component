@@ -1,6 +1,6 @@
 import { Pair, Token } from '@ubeswap/sdk';
-export declare function useIsDarkMode(): boolean;
-export declare function useDarkModeManager(): [boolean, () => void];
+import { SwapTheme } from '../../pages/Swap';
+export declare function useSwapTheme(): SwapTheme | null;
 export declare function useIsExpertMode(): boolean;
 export declare function useExpertModeManager(): [boolean, () => void];
 export declare function useUserMinApprove(): [boolean, (minApprove: boolean) => void];

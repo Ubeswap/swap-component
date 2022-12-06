@@ -46,23 +46,25 @@ import {
   useSwapActionHandlers,
   useSwapState,
 } from '../../state/swap/hooks'
-import { updateUserDarkMode } from '../../state/user/actions'
+import { updateTheme } from '../../state/user/actions'
 import { useExpertModeManager, useUserSingleHopOnly, useUserSlippageTolerance } from '../../state/user/hooks'
 import { ClickableText, LinkStyledButton, TYPE } from '../../theme'
 import { maxAmountSpend } from '../../utils/maxAmountSpend'
 import { computeTradePriceBreakdown, warningSeverity } from '../../utils/prices'
 import AppBody from '../AppBody'
+import { SwapTheme } from '../Swap'
 
 interface Props {
+  theme?: SwapTheme
   defaultSwapToken?: TokenInfo
   defaultTokenLists?: TokenInfo[]
   minimaPartnerId?: BigNumberish
   useDarkMode?: boolean
 }
 
-export default function SwapBody({ defaultSwapToken, defaultTokenLists, minimaPartnerId, useDarkMode }: Props) {
+export default function SwapBody({ theme: swapTheme, defaultSwapToken, defaultTokenLists, minimaPartnerId }: Props) {
   const dispatch = useDispatch<AppDispatch>()
-  dispatch(updateUserDarkMode({ userDarkMode: useDarkMode ?? false }))
+  dispatch(updateTheme({ theme: swapTheme }))
 
   const { t } = useTranslation()
   const loadedUrlParams = useDefaultsFromURLSearch(defaultSwapToken?.address)
@@ -348,6 +350,13 @@ export default function SwapBody({ defaultSwapToken, defaultTokenLists, minimaPa
               otherCurrency={currencies[Field.OUTPUT]}
               defaultTokenLists={defaultTokenLists}
               disableCurrencySelect={defaultSwapToken && currencies[Field.INPUT]?.address === defaultSwapToken.address}
+              defaultTokenLogoURI={
+                defaultSwapToken &&
+                currencies[Field.INPUT]?.address === defaultSwapToken.address &&
+                defaultSwapToken.logoURI
+                  ? defaultSwapToken.logoURI
+                  : undefined
+              }
               id="swap-currency-input"
             />
             <AutoColumn justify="space-between">
@@ -380,6 +389,13 @@ export default function SwapBody({ defaultSwapToken, defaultTokenLists, minimaPa
               onCurrencySelect={handleOutputSelect}
               otherCurrency={currencies[Field.INPUT]}
               defaultTokenLists={defaultTokenLists}
+              defaultTokenLogoURI={
+                defaultSwapToken &&
+                currencies[Field.OUTPUT]?.address === defaultSwapToken.address &&
+                defaultSwapToken.logoURI
+                  ? defaultSwapToken.logoURI
+                  : undefined
+              }
               id="swap-currency-output"
               disableCurrencySelect={defaultSwapToken && currencies[Field.OUTPUT]?.address === defaultSwapToken.address}
               disabled

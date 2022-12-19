@@ -4,9 +4,12 @@ import { transparentize } from 'polished'
 import React, { useState } from 'react'
 import { AlertTriangle, ArrowLeft } from 'react-feather'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 
 import useTheme from '../../hooks/useTheme'
+import { AccountInfo } from '../../pages/Swap'
+import { AppState } from '../../state'
 import { useCombinedInactiveList } from '../../state/lists/hooks'
 import { useAddUserToken } from '../../state/user/hooks'
 import { CloseIcon, TYPE } from '../../theme'
@@ -51,7 +54,9 @@ export function ImportToken({ tokens, onBack, onDismiss, handleCurrencySelect }:
   const theme = useTheme()
 
   const { network } = useContractKit()
-  const chainId = network.chainId as unknown as ChainId
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const chainId = (accountInfo ? accountInfo.chainId : network.chainId) as unknown as ChainId
+  const explorerUrl = accountInfo ? accountInfo.explorerUrl : network.explorer
 
   const [confirmed, setConfirmed] = useState(false)
 
@@ -92,7 +97,7 @@ export function ImportToken({ tokens, onBack, onDismiss, handleCurrencySelect }:
                   <TYPE.darkGray fontWeight={300}>{token.name}</TYPE.darkGray>
                 </AutoRow>
                 {chainId && (
-                  <ExternalLink href={`${network.explorer}/address/${token.address}`}>
+                  <ExternalLink href={`${explorerUrl}/address/${token.address}`}>
                     <AddressText>{token.address}</AddressText>
                   </ExternalLink>
                 )}

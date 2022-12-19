@@ -2,9 +2,12 @@ import { useContractKit } from '@celo-tools/use-contractkit'
 import { ChainId } from '@ubeswap/sdk'
 import React, { useCallback, useContext } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import styled, { ThemeContext } from 'styled-components'
 
 import useENS from '../../hooks/useENS'
+import { AccountInfo } from '../../pages/Swap'
+import { AppState } from '../../state'
 import { ExternalLink, TYPE } from '../../theme'
 import { AutoColumn } from '../Column'
 import { RowBetween } from '../Row'
@@ -79,7 +82,10 @@ export default function AddressInputPanel({
   onChange: (value: string) => void
 }) {
   const { network } = useContractKit()
-  const chainId = network.chainId as unknown as ChainId
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const chainId = (accountInfo ? accountInfo.chainId : network.chainId) as unknown as ChainId
+  const explorerUrl = accountInfo ? accountInfo.explorerUrl : network.explorer
+
   const theme = useContext(ThemeContext)
 
   const { address, loading } = useENS(value)
@@ -106,7 +112,7 @@ export default function AddressInputPanel({
                 Recipient
               </TYPE.black>
               {address && chainId && (
-                <ExternalLink href={`${network.explorer}/address/${address}`} style={{ fontSize: '14px' }}>
+                <ExternalLink href={`${explorerUrl}/address/${address}`} style={{ fontSize: '14px' }}>
                   ({t('ViewOnCeloExplorer')})
                 </ExternalLink>
               )}

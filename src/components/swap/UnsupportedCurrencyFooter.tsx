@@ -1,9 +1,12 @@
 import { useContractKit } from '@celo-tools/use-contractkit'
 import { ChainId, Token } from '@ubeswap/sdk'
 import React, { useState } from 'react'
+import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 
 import { useUnsupportedTokens } from '../../hooks/Tokens'
+import { AccountInfo } from '../../pages/Swap'
+import { AppState } from '../../state'
 import { CloseIcon, ExternalLink, TYPE } from '../../theme'
 import { ButtonEmpty } from '../Button'
 import Card, { OutlineCard } from '../Card'
@@ -45,7 +48,10 @@ export default function UnsupportedCurrencyFooter({
   currencies: (Token | undefined)[]
 }) {
   const { network } = useContractKit()
-  const chainId = network.chainId as unknown as ChainId
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const chainId = (accountInfo ? accountInfo.chainId : network.chainId) as unknown as ChainId
+  const explorerUrl = accountInfo ? accountInfo.explorerUrl : network.explorer
+
   const [showDetails, setShowDetails] = useState(false)
 
   const tokens = currencies
@@ -74,7 +80,7 @@ export default function UnsupportedCurrencyFooter({
                         <TYPE.body fontWeight={500}>{token.symbol}</TYPE.body>
                       </AutoRow>
                       {chainId && (
-                        <ExternalLink href={`${network.explorer}/address/${token.address}`}>
+                        <ExternalLink href={`${explorerUrl}/address/${token.address}`}>
                           <AddressText>{token.address}</AddressText>
                         </ExternalLink>
                       )}

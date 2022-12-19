@@ -1,7 +1,10 @@
 import { useContractKit, useProvider } from '@celo-tools/use-contractkit'
 import { ChainId, currencyEquals, JSBI, Pair, Route, Token, TokenAmount } from '@ubeswap/sdk'
 import { useMemo } from 'react'
+import { useSelector } from 'react-redux'
 
+import { AccountInfo } from '../../../../pages/Swap'
+import { AppState } from '../../../../state'
 import { useUserAllowMoolaWithdrawal } from '../../../../state/user/hooks'
 import { moolaDuals } from './useMoola'
 
@@ -13,7 +16,9 @@ export const useMoolaDirectRoute = (
 ): Route | null => {
   const library = useProvider()
   const { network } = useContractKit()
-  const chainId = network.chainId as unknown as ChainId
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const chainId = (accountInfo ? accountInfo.chainId : network.chainId) as unknown as ChainId
+  const provider = accountInfo ? accountInfo.provider : library
   const [allowMoolaWithdrawal] = useUserAllowMoolaWithdrawal()
 
   return useMemo(() => {
@@ -21,7 +26,11 @@ export const useMoolaDirectRoute = (
       return null
     }
 
-    if (!library) {
+    if (chainId !== ChainId.ALFAJORES && chainId !== ChainId.MAINNET) {
+      return null
+    }
+
+    if (!provider) {
       return null
     }
 
@@ -47,5 +56,5 @@ export const useMoolaDirectRoute = (
       inputCurrency,
       outputCurrency
     )
-  }, [inputCurrency, outputCurrency, allowMoolaWithdrawal, chainId, library])
+  }, [inputCurrency, outputCurrency, allowMoolaWithdrawal, chainId, provider])
 }

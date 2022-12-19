@@ -3,6 +3,7 @@ import '@celo-tools/use-contractkit/lib/styles.css'
 
 import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client'
 import { ContractKitProvider } from '@celo-tools/use-contractkit'
+import { Web3Provider } from '@ethersproject/providers'
 import { ErrorBoundary } from '@sentry/react'
 import { TokenInfo } from '@uniswap/token-lists'
 import { BigNumberish } from 'ethers'
@@ -123,11 +124,20 @@ export interface SwapTheme {
   userDarkMode?: boolean
 }
 
+export interface AccountInfo {
+  account: string
+  explorerUrl: string
+  chainId: number
+  provider: Web3Provider
+}
+
 interface Props {
+  accountInfo?: AccountInfo
   theme?: SwapTheme
   defaultSwapToken?: TokenInfo
   tokenLists?: TokenInfo[][]
   minimaPartnerId?: BigNumberish
+  onConnectWallet?: () => void
 }
 
 const BodyWrapper = styled.div<{ color?: string; fontFamily?: string }>`
@@ -140,7 +150,14 @@ const BodyWrapper = styled.div<{ color?: string; fontFamily?: string }>`
   font-family: ${({ fontFamily }) => (fontFamily ? fontFamily : 'unset')};
 `
 
-export default function Swap({ theme, defaultSwapToken, tokenLists, minimaPartnerId }: Props) {
+export default function Swap({
+  accountInfo,
+  theme,
+  defaultSwapToken,
+  tokenLists,
+  minimaPartnerId,
+  onConnectWallet,
+}: Props) {
   const [defaultTokenLists, setDefaultTokenLists] = useState<TokenInfo[] | undefined>([])
 
   useEffect(() => {
@@ -208,10 +225,12 @@ export default function Swap({ theme, defaultSwapToken, tokenLists, minimaPartne
                       fallback={<p>An unexpected error occured on this part of the page. Please reload.</p>}
                     >
                       <SwapBody
+                        accountInfo={accountInfo}
                         theme={theme}
                         defaultSwapToken={defaultSwapToken}
                         defaultTokenLists={defaultTokenLists}
                         minimaPartnerId={minimaPartnerId}
+                        onConnectWallet={onConnectWallet}
                       />
                     </ErrorBoundary>
                     <Marginer />

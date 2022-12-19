@@ -1,8 +1,11 @@
 import { useContractKit } from '@celo-tools/use-contractkit'
 import { ChainId } from '@ubeswap/sdk'
 import React, { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 import styled, { keyframes } from 'styled-components'
 
+import { AccountInfo } from '../../pages/Swap'
+import { AppState } from '../../state'
 import { useBlockNumber } from '../../state/application/hooks'
 import { ExternalLink, TYPE } from '../../theme'
 
@@ -64,7 +67,9 @@ const Spinner = styled.div`
 
 export default function Polling() {
   const { network } = useContractKit()
-  const chainId = network.chainId as unknown as ChainId
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const chainId = (accountInfo ? accountInfo.chainId : network.chainId) as unknown as ChainId
+  const explorerUrl = accountInfo ? accountInfo.explorerUrl : network.explorer
 
   const blockNumber = useBlockNumber()
 
@@ -85,7 +90,7 @@ export default function Polling() {
   )
 
   return (
-    <ExternalLink href={chainId && blockNumber ? `${network.explorer}/blocks` : ''}>
+    <ExternalLink href={chainId && blockNumber ? `${explorerUrl}/blocks` : ''}>
       <StyledPolling>
         <TYPE.small style={{ opacity: isMounted ? '0.2' : '0.6' }}>{blockNumber}</TYPE.small>
         <StyledPollingDot>{!isMounted && <Spinner />}</StyledPollingDot>

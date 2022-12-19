@@ -7,7 +7,7 @@ import { shallowEqual, useDispatch, useSelector } from 'react-redux'
 
 import { BASES_TO_TRACK_LIQUIDITY_FOR, PINNED_PAIRS } from '../../constants'
 import { useAllTokens } from '../../hooks/Tokens'
-import { SwapTheme } from '../../pages/Swap'
+import { AccountInfo, SwapTheme } from '../../pages/Swap'
 import { AppDispatch, AppState } from '../index'
 import {
   addSerializedPair,
@@ -194,7 +194,8 @@ export function useRemoveUserAddedToken(): (chainId: number, address: string) =>
 
 export function useUserAddedTokens(): Token[] {
   const { network } = useContractKit()
-  const chainId = network.chainId
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const chainId = accountInfo ? accountInfo.chainId : network.chainId
   const serializedTokensMap = useSelector<AppState, AppState['user']['tokens']>(({ user: { tokens } }) => tokens)
 
   return useMemo(() => {
@@ -244,7 +245,8 @@ export function toV2LiquidityToken([tokenA, tokenB]: [Token, Token]): Token {
  */
 export function useTrackedTokenPairs(): [Token, Token][] {
   const { network } = useContractKit()
-  const chainId = network.chainId
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const chainId = accountInfo ? accountInfo.chainId : network.chainId
   const tokens = useAllTokens()
 
   // pinned pairs

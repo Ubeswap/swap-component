@@ -4,6 +4,7 @@ import { ChainId as UbeswapChainId, JSBI, Pair, Token, TokenAmount } from '@ubes
 import zip from 'lodash/zip'
 // Hooks
 import React, { useEffect, useMemo } from 'react'
+import { useSelector } from 'react-redux'
 
 import ERC_20_INTERFACE from '../../constants/abis/erc20'
 import { STAKING_REWARDS_INTERFACE } from '../../constants/abis/staking-rewards'
@@ -16,6 +17,8 @@ import { useAllTokens } from '../../hooks/Tokens'
 import { usePoolManagerContract, useTokenContract } from '../../hooks/useContract'
 import useCurrentBlockTimestamp from '../../hooks/useCurrentBlockTimestamp'
 import { useFarmRegistry } from '../../pages/Earn/useFarmRegistry'
+import { AccountInfo } from '../../pages/Swap'
+import { AppState } from '../../state'
 import {
   NEVER_RELOAD,
   useMultipleContractSingleData,
@@ -72,7 +75,10 @@ type MultiRewardPool = {
 }
 
 export const useMultiRewardPools = (): MultiRewardPool[] => {
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
   const library = useProvider()
+  const provider = accountInfo ? accountInfo.provider : library
+
   const farmSummaries = useFarmRegistry()
 
   const [multiRewardPools, setMultiRewardPools] = React.useState<MultiRewardPool[]>([])
@@ -82,7 +88,7 @@ export const useMultiRewardPools = (): MultiRewardPool[] => {
 
     await Promise.all(
       farmSummaries.map(async (fs) => {
-        let poolContract = MoolaStakingRewards__factory.connect(fs.stakingAddress, library)
+        let poolContract = MoolaStakingRewards__factory.connect(fs.stakingAddress, provider)
         const rewardsTokens = []
         const externalStakingRwdAddresses = []
 
@@ -102,7 +108,7 @@ export const useMultiRewardPools = (): MultiRewardPool[] => {
             externalStakingRwdAddresses.push(externalStakingRewardAddr)
 
             // capture the contract's reward token
-            poolContract = MoolaStakingRewards__factory.connect(externalStakingRewardAddr, library)
+            poolContract = MoolaStakingRewards__factory.connect(externalStakingRewardAddr, provider)
             rewardsTokens.push(await poolContract.rewardsToken())
 
             // determine if the underlying contract is active or not
@@ -132,7 +138,7 @@ export const useMultiRewardPools = (): MultiRewardPool[] => {
       })
     )
     setMultiRewardPools(multiRwdPools)
-  }, [farmSummaries, library])
+  }, [farmSummaries, provider])
 
   useEffect(() => {
     call()
@@ -186,8 +192,9 @@ interface UnclaimedInfo {
 }
 
 export const useUnclaimedStakingRewards = (): UnclaimedInfo => {
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
   const { network } = useContractKit()
-  const { chainId } = network
+  const chainId = accountInfo ? accountInfo.chainId : network.chainId
   const ube = chainId ? UBE[chainId as unknown as UbeswapChainId] : undefined
   const ubeContract = useTokenContract(ube?.address)
   const poolManagerContract = usePoolManagerContract(
@@ -255,8 +262,9 @@ interface IStakingPool {
 }
 
 export function useStakingPools(pairToFilterBy?: Pair | null, stakingAddress?: string): readonly IStakingPool[] {
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
   const { network } = useContractKit()
-  const chainId = network.chainId as unknown as UbeswapChainId
+  const chainId = (accountInfo ? accountInfo.chainId : network.chainId) as unknown as UbeswapChainId
   const ube = chainId ? UBE[chainId] : undefined
 
   const poolManagerContract = usePoolManagerContract(
@@ -392,8 +400,9 @@ export function useStakingPoolsInfo(
 export function usePairDataFromAddresses(
   pairAddresses: readonly string[]
 ): readonly (readonly [Token, Token] | undefined)[] {
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
   const { network } = useContractKit()
-  const chainId = network.chainId as unknown as UbeswapChainId
+  const chainId = (accountInfo ? accountInfo.chainId : network.chainId) as unknown as UbeswapChainId
 
   const token0Data = useMultipleContractSingleData(
     pairAddresses,
@@ -489,9 +498,10 @@ export function usePairDataFromAddresses(
 }
 
 export function useTotalUbeEarned(): TokenAmount | undefined {
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
   const { network } = useContractKit()
-  const { chainId } = network
-  const ube = chainId ? UBE[chainId as unknown as UbeswapChainId] : undefined
+  const chainId = (accountInfo ? accountInfo.chainId : network.chainId) as unknown as UbeswapChainId
+  const ube = chainId ? UBE[chainId] : undefined
   const stakingInfos = useStakingInfo()
 
   return useMemo(() => {
@@ -511,9 +521,10 @@ export function useTotalUbeEarned(): TokenAmount | undefined {
 }
 
 export function useFilteredStakingInfo(stakingAddresses: string[]): readonly StakingInfo[] | undefined {
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
   const { network } = useContractKit()
-  const { chainId } = network
-  const ube = chainId ? UBE[chainId as unknown as UbeswapChainId] : undefined
+  const chainId = (accountInfo ? accountInfo.chainId : network.chainId) as unknown as UbeswapChainId
+  const ube = chainId ? UBE[chainId] : undefined
   const stakingInfos = useStakingInfo()
   return useMemo(() => {
     if (!ube) return
@@ -524,9 +535,10 @@ export function useFilteredStakingInfo(stakingAddresses: string[]): readonly Sta
 }
 
 export function useFarmRewardsInfo(stakingAddresses: string[]): readonly StakingInfo[] | undefined {
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
   const { network } = useContractKit()
-  const { chainId } = network
-  const ube = chainId ? UBE[chainId as unknown as UbeswapChainId] : undefined
+  const chainId = (accountInfo ? accountInfo.chainId : network.chainId) as unknown as UbeswapChainId
+  const ube = chainId ? UBE[chainId] : undefined
   const stakingInfos = useStakingInfo()
   return useMemo(() => {
     if (!ube) return
@@ -546,7 +558,8 @@ export function useDerivedStakeInfo(
   error?: string
 } {
   const { address } = useContractKit()
-
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const account = accountInfo ? accountInfo.account : address
   const parsedInput: TokenAmount | undefined = tryParseAmount(typedValue, stakingToken ?? undefined)
 
   const parsedAmount =
@@ -555,7 +568,7 @@ export function useDerivedStakeInfo(
       : undefined
 
   let error: string | undefined
-  if (!address) {
+  if (!account) {
     error = 'Connect Wallet'
   }
   if (!parsedAmount) {
@@ -577,13 +590,15 @@ export function useDerivedUnstakeInfo(
   error?: string
 } {
   const { address } = useContractKit()
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const account = accountInfo ? accountInfo.account : address
 
   const parsedInput: TokenAmount | undefined = tryParseAmount(typedValue, stakingAmount.token)
 
   const parsedAmount = parsedInput && JSBI.lessThanOrEqual(parsedInput.raw, stakingAmount.raw) ? parsedInput : undefined
 
   let error: string | undefined
-  if (!address) {
+  if (!account) {
     error = 'Connect Wallet'
   }
   if (!parsedAmount) {

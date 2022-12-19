@@ -82,3 +82,33 @@ function App() {
   ]}
 />
 ```
+
+### Specify Custom Wallet Infomation
+
+```jsx
+<Swap
+  accountInfo={{
+    account: '0xEadf4A7168A82D30Ba0619e64d5BCf5B30B45226',
+    explorerUrl: 'https://forno.celo.org',
+    chainId: 42220,
+    provider: provider,
+  }}
+/>
+```
+
+Type of the accountInfo is same as below
+
+```jsx
+interface AccountInfo {
+  account: string
+  explorerUrl: string
+  chainId: number
+  provider: Web3Provider
+}
+```
+
+### Specify Custom Wallet Connect Function
+
+```jsx
+<Swap onConnectWallet={handleConnectWallet} />
+```

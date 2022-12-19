@@ -4,8 +4,11 @@ import { currencyEquals, Token } from '@ubeswap/sdk'
 import { TokenInfo } from '@uniswap/token-lists'
 import { arrayify } from 'ethers/lib/utils'
 import { useMemo } from 'react'
+import { useSelector } from 'react-redux'
 
 import { filterTokens } from '../components/SearchModal/filtering'
+import { AccountInfo } from '../pages/Swap'
+import { AppState } from '../state'
 import { useCombinedActiveList, useCombinedInactiveList } from '../state/lists/hooks'
 import { NEVER_RELOAD, useSingleCallResult } from '../state/multicall/hooks'
 import { useUserAddedTokens } from '../state/user/hooks'
@@ -20,7 +23,8 @@ function useTokensFromMap(
   chainIdOpt?: ChainId
 ): { [address: string]: Token } {
   const { network } = useContractKit()
-  const chainId = chainIdOpt || network.chainId
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const chainId = chainIdOpt || ((accountInfo ? accountInfo.chainId : network.chainId) as unknown as ChainId)
   const userAddedTokens = useUserAddedTokens()
 
   return useMemo(() => {
@@ -98,8 +102,9 @@ export function useIsTokenActive(token: Token | undefined | null): boolean {
 
 // used to detect extra search results
 export function useFoundOnInactiveList(searchQuery: string): Token[] | undefined {
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
   const { network } = useContractKit()
-  const chainId = network.chainId
+  const chainId = accountInfo ? accountInfo.chainId : network.chainId
   const inactiveTokens = useAllInactiveTokens()
 
   return useMemo(() => {
@@ -139,8 +144,9 @@ function parseStringOrBytes32(str: string | undefined, bytes32: string | undefin
 // null if loading
 // otherwise returns the token
 export function useToken(tokenAddress?: string): Token | undefined | null {
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
   const { network } = useContractKit()
-  const chainId = network.chainId
+  const chainId = accountInfo ? accountInfo.chainId : network.chainId
   const tokens = useAllTokens()
 
   const address = isAddress(tokenAddress)

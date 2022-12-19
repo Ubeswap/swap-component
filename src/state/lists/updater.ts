@@ -1,18 +1,22 @@
 import { useProvider } from '@celo-tools/use-contractkit'
 import { useCallback, useEffect } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import { useAllInactiveTokens } from '../../hooks/Tokens'
 import { useFetchListCallback } from '../../hooks/useFetchListCallback'
 import useInterval from '../../hooks/useInterval'
 import useIsWindowVisible from '../../hooks/useIsWindowVisible'
+import { AccountInfo } from '../../pages/Swap'
+import { AppState } from '../../state'
 import { useAllLists } from '../../state/lists/hooks'
 import { AppDispatch } from '../index'
 import { acceptListUpdate } from './actions'
 // import { useActiveListUrls } from './hooks'
 
 export default function Updater(): null {
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
   const library = useProvider()
+  const provider = accountInfo ? accountInfo.provider : library
   const dispatch = useDispatch<AppDispatch>()
   const isWindowVisible = useIsWindowVisible()
 
@@ -32,7 +36,7 @@ export default function Updater(): null {
   }, [fetchList, isWindowVisible, lists])
 
   // fetch all lists every 10 minutes, but only after we initialize library
-  useInterval(fetchAllListsCallback, library ? 1000 * 60 * 10 : null)
+  useInterval(fetchAllListsCallback, provider ? 1000 * 60 * 10 : null)
 
   // whenever a list is not loaded and not loading, try again to load it
   useEffect(() => {
@@ -42,7 +46,7 @@ export default function Updater(): null {
         fetchList(listUrl).catch((error) => console.debug('list added fetching error', error))
       }
     })
-  }, [dispatch, fetchList, library, lists])
+  }, [dispatch, fetchList, provider, lists])
 
   // automatically update lists if versions are minor/patch
   useEffect(() => {

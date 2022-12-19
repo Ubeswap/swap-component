@@ -4,10 +4,13 @@ import { TokenInfo } from '@uniswap/token-lists'
 import { darken, lighten } from 'polished'
 import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 
 import DropDown from '../../assets/svgs/dropdown'
 import useTheme from '../../hooks/useTheme'
+import { AccountInfo } from '../../pages/Swap'
+import { AppState } from '../../state'
 import { useCurrencyBalance } from '../../state/wallet/hooks'
 import { TYPE } from '../../theme'
 import CurrencyLogo from '../CurrencyLogo'
@@ -149,8 +152,9 @@ export default function CurrencyInputPanel({
 }: CurrencyInputPanelProps) {
   const { t } = useTranslation()
   const [modalOpen, setModalOpen] = useState(false)
-  const { address: account } = useContractKit()
-
+  const { address } = useContractKit()
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const account = accountInfo ? accountInfo.account : address
   const userBalance = useCurrencyBalance(account ?? undefined, currency ?? undefined)
   const selectedCurrencyBalance = balanceOverride ?? userBalance
   const theme = useTheme()

@@ -1,11 +1,14 @@
-import { useContractKit, useGetConnectedSigner } from '@celo-tools/use-contractkit'
+import { useContractKit, useProvider } from '@celo-tools/use-contractkit'
 import { JsonRpcSigner } from '@ethersproject/providers'
 import { ChainId, Trade } from '@ubeswap/sdk'
 import { BigNumber, BigNumberish, CallOverrides, Contract, ContractTransaction, PayableOverrides } from 'ethers'
 import { useCallback } from 'react'
+import { useSelector } from 'react-redux'
 
+import { AccountInfo } from '../../../pages/Swap'
+import { AppState } from '../../../state'
 import { useTransactionAdder } from '../../../state/transactions/hooks'
-import { calculateGasMargin } from '../../../utils'
+import { calculateGasMargin, getProviderOrSigner } from '../../../utils'
 
 type Head<T extends any[]> = Required<T> extends [...infer H, any] ? H : never
 type Last<T extends Array<unknown>> = Required<T> extends [...unknown[], infer L] ? L : never
@@ -92,15 +95,18 @@ const estimateGas = async (call: ContractCall): Promise<BigNumber> => {
  */
 export const useDoTransaction = (): DoTransactionFn => {
   const addTransaction = useTransactionAdder()
-  const { network } = useContractKit()
-  const getConnectedSigner = useGetConnectedSigner()
-  const chainId = network.chainId as unknown as ChainId
+  const { network, address } = useContractKit()
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const account = accountInfo ? accountInfo.account : address
+  const chainId = (accountInfo ? accountInfo.chainId : network.chainId) as unknown as ChainId
+  const library = useProvider()
+  const provider = getProviderOrSigner(accountInfo ? accountInfo.provider : library, account || undefined)
   return useCallback(
     async (contractDisconnected, methodName, args): Promise<ContractTransaction> => {
       if (chainId === ChainId.BAKLAVA) {
         throw new Error('baklava not supported')
       }
-      const contract = contractDisconnected.connect(await getConnectedSigner())
+      const contract = contractDisconnected.connect(provider)
       const call = { contract, methodName, args: args.args, value: args.overrides?.value }
       const gasEstimate = await estimateGas(call)
 
@@ -126,6 +132,6 @@ export const useDoTransaction = (): DoTransactionFn => {
         }
       }
     },
-    [addTransaction, chainId, getConnectedSigner]
+    [addTransaction, chainId, provider]
   )
 }

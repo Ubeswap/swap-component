@@ -2,12 +2,14 @@ import { useContractKit } from '@celo-tools/use-contractkit'
 import { useCallback, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { AccountInfo } from '../../pages/Swap'
 import { AppDispatch, AppState } from '../index'
 import { addPopup, ApplicationModal, PopupContent, removePopup, setOpenModal } from './actions'
 
 export function useBlockNumber(): number | undefined {
   const { network } = useContractKit()
-  const chainId = network.chainId
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const chainId = accountInfo ? accountInfo.chainId : network.chainId
 
   return useSelector((state: AppState) => state.application.blockNumber[chainId ?? -1])
 }

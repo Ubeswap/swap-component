@@ -2,16 +2,20 @@ import { useContractKit } from '@celo-tools/use-contractkit'
 import { Pair, Token, TokenAmount, Trade } from '@ubeswap/sdk'
 import flatMap from 'lodash.flatmap'
 import { useMemo } from 'react'
+import { useSelector } from 'react-redux'
 
 import { BASES_TO_CHECK_TRADES_AGAINST, BETTER_TRADE_LESS_HOPS_THRESHOLD } from '../../../../constants'
 import { PairState, usePairs } from '../../../../data/Reserves'
+import { AccountInfo } from '../../../../pages/Swap'
+import { AppState } from '../../../../state'
 import { useUserSingleHopOnly } from '../../../../state/user/hooks'
 import { isTradeBetter } from '../../../../utils/trades'
 import { UbeswapTrade } from '../trade'
 
 function useAllCommonPairs(tokenA?: Token, tokenB?: Token): Pair[] {
   const { network } = useContractKit()
-  const chainId = network.chainId
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const chainId = accountInfo ? accountInfo.chainId : network.chainId
 
   const bases: Token[] = useMemo(() => {
     if (!chainId) return []

@@ -1,15 +1,25 @@
-import { useContractKit, useGetConnectedSigner, useProvider } from '@celo-tools/use-contractkit'
+import { useContractKit, useProvider } from '@celo-tools/use-contractkit'
 import { BigNumber } from '@ethersproject/bignumber'
 import { Contract } from '@ethersproject/contracts'
 import { JSBI, Percent, Router, SwapParameters, Trade } from '@ubeswap/sdk'
 import { ContractTransaction } from 'ethers'
 import { useMemo } from 'react'
+import { useSelector } from 'react-redux'
 import invariant from 'tiny-invariant'
 
 import { MoolaRouterTrade } from '../components/swap/routing/hooks/useTrade'
 import { BIPS_BASE, INITIAL_ALLOWED_SLIPPAGE } from '../constants'
+import { AccountInfo } from '../pages/Swap'
+import { AppState } from '../state'
 import { useTransactionAdder } from '../state/transactions/hooks'
-import { calculateGasMargin, getMoolaRouterContract, getRouterContract, isAddress, shortenAddress } from '../utils'
+import {
+  calculateGasMargin,
+  getMoolaRouterContract,
+  getProviderOrSigner,
+  getRouterContract,
+  isAddress,
+  shortenAddress,
+} from '../utils'
 import isZero from '../utils/isZero'
 import useENS from './useENS'
 import useTransactionDeadline from './useTransactionDeadline'
@@ -48,21 +58,24 @@ function useSwapCallArguments(
   allowedSlippage: number = INITIAL_ALLOWED_SLIPPAGE, // in bips
   recipientAddressOrName: string | null // the ENS name or address of the recipient of the trade, or null if swap should be returned to sender
 ): SwapCall[] {
-  const { address: account, network } = useContractKit()
+  const { address, network } = useContractKit()
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
   const library = useProvider()
-  const chainId = network.chainId
+  const provider = accountInfo ? accountInfo.provider : library
+  const chainId = accountInfo ? accountInfo.chainId : network.chainId
+  const account = accountInfo ? accountInfo.account : address
 
   const { address: recipientAddress } = useENS(recipientAddressOrName)
   const recipient = recipientAddressOrName === null ? account : recipientAddress
   const deadline = useTransactionDeadline()
 
   return useMemo(() => {
-    if (!trade || !recipient || !library || !account || !chainId || !deadline) return []
+    if (!trade || !recipient || !provider || !account || !chainId || !deadline) return []
 
     const contract =
       trade instanceof MoolaRouterTrade
-        ? getMoolaRouterContract(chainId, library, account)
-        : getRouterContract(chainId, library, account)
+        ? getMoolaRouterContract(chainId, provider, account)
+        : getRouterContract(chainId, provider, account)
 
     const swapCallParameters = Router.swapCallParameters(trade, {
       feeOnTransfer: false,
@@ -90,7 +103,7 @@ function useSwapCallArguments(
     // }
 
     return swapMethods.map((parameters) => ({ parameters, contract }))
-  }, [account, allowedSlippage, chainId, deadline, library, recipient, trade])
+  }, [account, allowedSlippage, chainId, deadline, provider, recipient, trade])
 }
 
 // returns a function that will execute a swap, if the parameters are all valid
@@ -100,9 +113,12 @@ export function useSwapCallback(
   allowedSlippage: number = INITIAL_ALLOWED_SLIPPAGE, // in bips
   recipientAddressOrName: string | null // the ENS name or address of the recipient of the trade, or null if swap should be returned to sender
 ): { state: SwapCallbackState; callback: null | (() => Promise<string>); error: string | null } {
-  const { network, address: account } = useContractKit()
-  const chainId = network.chainId
+  const { network, address } = useContractKit()
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const chainId = accountInfo ? accountInfo.chainId : network.chainId
+  const account = accountInfo ? accountInfo.account : address
   const library = useProvider()
+  const provider = accountInfo ? accountInfo.provider : library
 
   const swapCalls = useSwapCallArguments(trade, allowedSlippage, recipientAddressOrName)
 
@@ -111,10 +127,10 @@ export function useSwapCallback(
   const { address: recipientAddress } = useENS(recipientAddressOrName)
   const recipient = recipientAddressOrName === null ? account : recipientAddress
 
-  const getConnectedSigner = useGetConnectedSigner()
+  const providerOrSigner = getProviderOrSigner(provider, account || undefined)
 
   return useMemo(() => {
-    if (!trade || !library || !account || !chainId) {
+    if (!trade || !provider || !account || !chainId) {
       return { state: SwapCallbackState.INVALID, callback: null, error: 'Missing dependencies' }
     }
     if (!recipient) {
@@ -189,7 +205,7 @@ export function useSwapCallback(
           gasEstimate,
         } = successfulEstimation
 
-        const contract = disconnectedContract.connect(await getConnectedSigner())
+        const contract = disconnectedContract.connect(providerOrSigner)
         return contract[methodName](...args, {
           gasLimit: calculateGasMargin(gasEstimate),
         })
@@ -234,13 +250,13 @@ export function useSwapCallback(
     }
   }, [
     trade,
-    library,
+    providerOrSigner,
     account,
     chainId,
     recipient,
     recipientAddressOrName,
     swapCalls,
-    getConnectedSigner,
     addTransaction,
+    provider,
   ])
 }

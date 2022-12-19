@@ -2,10 +2,13 @@ import { useContractKit } from '@celo-tools/use-contractkit'
 import { Token } from '@ubeswap/sdk'
 import React, { CSSProperties } from 'react'
 import { CheckCircle } from 'react-feather'
+import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 
 import { useIsTokenActive, useIsUserAddedToken } from '../../hooks/Tokens'
 import useTheme from '../../hooks/useTheme'
+import { AccountInfo } from '../../pages/Swap'
+import { AppState } from '../../state'
 import { useCombinedInactiveList } from '../../state/lists/hooks'
 import { TYPE } from '../../theme'
 import { ButtonPrimary } from '../Button'
@@ -56,7 +59,8 @@ export default function ImportRow({
 }) {
   // gloabls
   const { network } = useContractKit()
-  const chainId = network.chainId
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const chainId = accountInfo ? accountInfo.chainId : network.chainId
   const theme = useTheme()
 
   // check if token comes from list

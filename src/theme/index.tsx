@@ -1,4 +1,3 @@
-import { transparentize } from 'polished'
 import React, { useMemo } from 'react'
 import { Text, TextProps } from 'rebass'
 import styled, {
@@ -8,7 +7,8 @@ import styled, {
   ThemeProvider as StyledComponentsThemeProvider,
 } from 'styled-components'
 
-import { useIsDarkMode } from '../state/user/hooks'
+import { SwapTheme } from '../pages/Swap'
+import { useSwapTheme } from '../state/user/hooks'
 import { Colors } from './styled'
 
 export * from './components'
@@ -35,7 +35,7 @@ const mediaWidthTemplates: { [width in keyof typeof MEDIA_WIDTHS]: typeof css } 
 const white = '#FFFFFF'
 const black = '#000000'
 
-export function colors(darkMode: boolean): Colors {
+export function colors(darkMode: boolean, primaryColor?: string): Colors {
   return {
     // base
     white,
@@ -60,7 +60,7 @@ export function colors(darkMode: boolean): Colors {
     advancedBG: darkMode ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.6)',
 
     //primary colors
-    primary1: darkMode ? '#8878C3' : '#8878C3',
+    primary1: primaryColor ? primaryColor : darkMode ? '#8878C3' : '#8878C3',
     primary2: darkMode ? '#E3DFF3' : '#FF8CC3',
     primary3: darkMode ? '#BFB7DE' : '#FF99C9',
     primary4: darkMode ? '#6D619A' : '#F6DDE8',
@@ -89,9 +89,10 @@ export function colors(darkMode: boolean): Colors {
   }
 }
 
-export function theme(darkMode: boolean): DefaultTheme {
+export function theme(swapTheme: SwapTheme | null): DefaultTheme {
+  const { userDarkMode: darkMode, fontFamily, primaryColor } = swapTheme ?? {}
   return {
-    ...colors(darkMode),
+    ...colors(darkMode ?? false, primaryColor),
 
     grids: {
       sm: 8,
@@ -118,9 +119,9 @@ export function theme(darkMode: boolean): DefaultTheme {
 }
 
 export default function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const darkMode = useIsDarkMode()
+  const swapTheme = useSwapTheme()
 
-  const themeObject = useMemo(() => theme(darkMode), [darkMode])
+  const themeObject = useMemo(() => theme(swapTheme), [swapTheme])
 
   return <StyledComponentsThemeProvider theme={themeObject}>{children}</StyledComponentsThemeProvider>
 }
@@ -211,19 +212,23 @@ html {
 }
 `
 
-export const ThemedGlobalStyle = createGlobalStyle`
-html {
-  color: ${({ theme }) => theme.text1};
-}
+// export const ThemedGlobalStyle = createGlobalStyle`
+// html {
+//   color: ${({ theme }) => theme.text1};
+// }
 
-body {
-  min-height: 100vh;
-  background-position: 0 -30vh;
-  background-repeat: no-repeat;
-  background-image: ${({ theme }) =>
-    `radial-gradient(50% 50% at 50% 50%, ${transparentize(0.9, theme.primary1)} 0%, ${transparentize(
-      1,
-      theme.bg1
-    )} 100%)`};
-}
+// body {
+//   min-height: 100vh;
+//   background-position: 0 -30vh;
+//   background-repeat: no-repeat;
+//   background-image: ${({ theme }) =>
+//     `radial-gradient(50% 50% at 50% 50%, ${transparentize(0.9, theme.primary1)} 0%, ${transparentize(
+//       1,
+//       theme.bg1
+//     )} 100%)`};
+// }
+// `
+
+export const ThemedGlobalStyle = createGlobalStyle`
+
 `

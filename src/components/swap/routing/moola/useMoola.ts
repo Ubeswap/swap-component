@@ -2,9 +2,12 @@ import { CeloContract } from '@celo/contractkit'
 import { useContractKit, useProvider } from '@celo-tools/use-contractkit'
 import { CELO, ChainId, cREAL, currencyEquals, cUSD, Token } from '@ubeswap/sdk'
 import { useMemo } from 'react'
+import { useSelector } from 'react-redux'
 
 import { CEUR, MCELO, MCEUR, MCREAL, MCUSD } from '../../../../constants/index'
 import { LendingPool, LendingPool__factory } from '../../../../generated'
+import { AccountInfo } from '../../../../pages/Swap'
+import { AppState } from '../../../../state'
 
 export const moolaLendingPools = {
   // Addresses from: https://github.com/moolamarket/moola
@@ -58,7 +61,8 @@ export type MoolaConfig = typeof moolaLendingPools[IMoolaChain]
 
 export const useMoolaConfig = () => {
   const { network } = useContractKit()
-  const chainId = network.chainId as unknown as ChainId
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const chainId = (accountInfo ? accountInfo.chainId : network.chainId) as unknown as ChainId
   // TODO(igm): this breaks on baklava
   const chainCfg = moolaLendingPools[chainId as IMoolaChain]
   if (chainCfg) {
@@ -76,6 +80,8 @@ export const useLendingPool = (): LendingPool => {
   if (!cfg) {
     throw new Error('no cfg')
   }
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
   const library = useProvider()
-  return useMemo(() => LendingPool__factory.connect(cfg.lendingPool, library as any), [cfg.lendingPool, library])
+  const provider = accountInfo ? accountInfo.provider : library
+  return useMemo(() => LendingPool__factory.connect(cfg.lendingPool, provider as any), [cfg.lendingPool, provider])
 }

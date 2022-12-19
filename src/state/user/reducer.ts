@@ -1,6 +1,7 @@
 import { createReducer } from '@reduxjs/toolkit'
 
 import { DEFAULT_DEADLINE_FROM_NOW, INITIAL_ALLOWED_SLIPPAGE } from '../../constants'
+import { SwapTheme } from '../../pages/Swap'
 import { updateVersion } from '../global/actions'
 import {
   addSerializedPair,
@@ -13,9 +14,9 @@ import {
   setValoraAccount,
   toggleURLWarning,
   updateMatchesDarkMode,
+  updateTheme,
   updateUserAllowMoolaWithdrawal,
   updateUserAprMode,
-  updateUserDarkMode,
   updateUserDeadline,
   updateUserDisableSmartRouting,
   updateUserExpertMode,
@@ -30,7 +31,7 @@ export interface UserState {
   // the timestamp of the last updateVersion action
   lastUpdateVersionTimestamp?: number
 
-  userDarkMode: boolean | null // the user's choice for dark mode or light mode
+  theme: SwapTheme | null // the user's choice for dark mode or light mode
   matchesDarkMode: boolean // whether the dark mode media query matches
 
   userExpertMode: boolean
@@ -76,7 +77,7 @@ function pairKey(token0Address: string, token1Address: string) {
 }
 
 export const initialState: UserState = {
-  userDarkMode: null,
+  theme: null,
   matchesDarkMode: false,
   userExpertMode: false,
   userSingleHopOnly: false,
@@ -110,8 +111,8 @@ export default createReducer(initialState, (builder) =>
 
       state.lastUpdateVersionTimestamp = currentTimestamp()
     })
-    .addCase(updateUserDarkMode, (state, action) => {
-      state.userDarkMode = action.payload.userDarkMode
+    .addCase(updateTheme, (state, action) => {
+      state.theme = action.payload.theme ?? null
       state.timestamp = currentTimestamp()
     })
     .addCase(updateMatchesDarkMode, (state, action) => {

@@ -3,10 +3,13 @@ import { ChainId } from '@ubeswap/sdk'
 import React, { useContext } from 'react'
 import { AlertTriangle, ArrowUpCircle } from 'react-feather'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import { Text } from 'rebass'
 import styled, { ThemeContext } from 'styled-components'
 
 import Circle from '../../assets/images/blue-loader.svg'
+import { AccountInfo } from '../../pages/Swap'
+import { AppState } from '../../state'
 import { ExternalLink } from '../../theme'
 import { CloseIcon, CustomLightSpinner } from '../../theme/components'
 import { ButtonPrimary } from '../Button'
@@ -73,6 +76,8 @@ function TransactionSubmittedContent({
 }) {
   const theme = useContext(ThemeContext)
   const { network } = useContractKit()
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const explorerUrl = accountInfo ? accountInfo.explorerUrl : network.explorer
   const { t } = useTranslation()
 
   return (
@@ -90,7 +95,7 @@ function TransactionSubmittedContent({
             {t('TransactionSubmitted')}
           </Text>
           {chainId && hash && (
-            <ExternalLink href={`${network.explorer}/tx/${hash}`}>
+            <ExternalLink href={`${explorerUrl}/tx/${hash}`}>
               <Text fontWeight={500} fontSize={14} color={theme.primary1}>
                 {t('ViewOnCeloExplorer')}
               </Text>
@@ -177,8 +182,9 @@ export default function TransactionConfirmationModal({
   pendingText,
   content,
 }: ConfirmationModalProps) {
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
   const { network } = useContractKit()
-  const chainId = network.chainId as unknown as ChainId
+  const chainId = (accountInfo ? accountInfo.chainId : network.chainId) as unknown as ChainId
 
   if (!chainId) return null
 

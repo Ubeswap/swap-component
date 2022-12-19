@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux'
 import { RouteComponentProps } from 'react-router-dom'
 
 import { AppDispatch } from '../state'
-import { updateUserDarkMode } from '../state/user/actions'
+import { updateTheme } from '../state/user/actions'
 
 export default function DarkModeQueryParamReader({ location: { search } }: RouteComponentProps): null {
   const dispatch = useDispatch<AppDispatch>()
@@ -23,9 +23,9 @@ export default function DarkModeQueryParamReader({ location: { search } }: Route
     if (typeof theme !== 'string') return
 
     if (theme.toLowerCase() === 'light') {
-      dispatch(updateUserDarkMode({ userDarkMode: false }))
+      dispatch(updateTheme({ theme: { userDarkMode: false } }))
     } else if (theme.toLowerCase() === 'dark') {
-      dispatch(updateUserDarkMode({ userDarkMode: true }))
+      dispatch(updateTheme({ theme: { userDarkMode: true } }))
     }
   }, [dispatch, search])
 

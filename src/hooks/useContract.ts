@@ -1,7 +1,9 @@
 import { useContractKit, useProvider } from '@celo-tools/use-contractkit'
 import { Contract } from '@ethersproject/contracts'
 import IUniswapV2PairABI from '@ubeswap/core/build/abi/IUniswapV2Pair.json'
+import { ChainId } from '@ubeswap/sdk'
 import { useMemo } from 'react'
+import { useSelector } from 'react-redux'
 
 import ENS_PUBLIC_RESOLVER_ABI from '../constants/abis/ens-public-resolver.json'
 import ERC20_ABI, { ERC20_BYTES32_ABI } from '../constants/abis/erc20'
@@ -24,23 +26,28 @@ import {
   StakingRewards,
 } from '../generated'
 import { ReleaseUbe } from '../generated/ReleaseUbe'
+import { AccountInfo } from '../pages/Swap'
+import { AppState } from '../state'
 import { StakingInfo } from '../state/stake/hooks'
 import { getContract } from '../utils'
 
 // returns null on errors
 function useContract(address: string | undefined, ABI: any, withSignerIfPossible = true): Contract | null {
-  const { address: account } = useContractKit()
+  const { address: accountAddress } = useContractKit()
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
   const library = useProvider()
+  const provider = accountInfo ? accountInfo.provider : library
+  const account = accountInfo ? accountInfo.account : accountAddress
 
   return useMemo(() => {
-    if (!address || !ABI || !library) return null
+    if (!address || !ABI || !provider) return null
     try {
-      return getContract(address, ABI, library, withSignerIfPossible && account ? account : undefined)
+      return getContract(address, ABI, provider, withSignerIfPossible && account ? account : undefined)
     } catch (error) {
       console.error('Failed to get contract', error)
       return null
     }
-  }, [address, ABI, library, withSignerIfPossible, account])
+  }, [address, ABI, provider, withSignerIfPossible, account])
 }
 
 function useContracts(
@@ -48,16 +55,19 @@ function useContracts(
   ABI: any,
   withSignerIfPossible = true
 ): (Contract | null)[] | null {
-  const { address: account } = useContractKit()
+  const { address } = useContractKit()
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
   const library = useProvider()
+  const provider = accountInfo ? accountInfo.provider : library
+  const account = accountInfo ? accountInfo.account : address
 
   return useMemo(() => {
-    if (!addresses || !ABI || !library) return null
+    if (!addresses || !ABI || !provider) return null
     return addresses.map((address) => {
       if (!address) return null
-      return getContract(address, ABI, library, withSignerIfPossible && account ? account : undefined)
+      return getContract(address, ABI, provider, withSignerIfPossible && account ? account : undefined)
     })
-  }, [addresses, ABI, library, withSignerIfPossible, account])
+  }, [addresses, ABI, provider, withSignerIfPossible, account])
 }
 
 export function useTokenContract(tokenAddress?: string, withSignerIfPossible?: boolean): Erc20 | null {
@@ -84,7 +94,8 @@ export function usePairContract(pairAddress?: string, withSignerIfPossible?: boo
 
 export function useMulticallContract(): Contract | null {
   const { network } = useContractKit()
-  const chainId = network.chainId
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const chainId = (accountInfo ? accountInfo.chainId : network.chainId) as unknown as ChainId
   return useContract(chainId ? MULTICALL_NETWORKS[chainId] : undefined, MULTICALL_ABI, false)
 }
 

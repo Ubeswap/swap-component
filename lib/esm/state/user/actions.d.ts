@@ -1,3 +1,4 @@
+import { SwapTheme } from '../../pages/Swap';
 export interface SerializedToken {
     chainId: number;
     address: string;
@@ -12,8 +13,8 @@ export interface SerializedPair {
 export declare const updateMatchesDarkMode: import("@reduxjs/toolkit").ActionCreatorWithPayload<{
     matchesDarkMode: boolean;
 }, string>;
-export declare const updateUserDarkMode: import("@reduxjs/toolkit").ActionCreatorWithPayload<{
-    userDarkMode: boolean;
+export declare const updateTheme: import("@reduxjs/toolkit").ActionCreatorWithPayload<{
+    theme: SwapTheme | undefined;
 }, string>;
 export declare const updateUserExpertMode: import("@reduxjs/toolkit").ActionCreatorWithPayload<{
     userExpertMode: boolean;

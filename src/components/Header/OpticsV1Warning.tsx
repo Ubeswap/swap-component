@@ -2,9 +2,12 @@ import { useContractKit } from '@celo-tools/use-contractkit'
 import { JSBI, Token } from '@ubeswap/sdk'
 import React, { useContext, useMemo } from 'react'
 import { AlertTriangle } from 'react-feather'
+import { useSelector } from 'react-redux'
 import styled, { ThemeContext } from 'styled-components'
 
 import { useAllTokens } from '../../hooks/Tokens'
+import { AccountInfo } from '../../pages/Swap'
+import { AppState } from '../../state'
 import { useTokenBalances } from '../../state/wallet/hooks'
 import { ExternalLink, TYPE } from '../../theme'
 import { AutoColumn, TopSection } from '../Column'
@@ -26,9 +29,11 @@ const WarningCard = styled(AutoColumn)<{ disabled?: boolean }>`
 `
 
 export default function OpticsV1Warning() {
-  const { address: account, network } = useContractKit()
+  const { address, network } = useContractKit()
   const theme = useContext(ThemeContext)
-  const chainId = network.chainId
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const account = accountInfo ? accountInfo.account : address
+  const chainId = accountInfo ? accountInfo.chainId : network.chainId
   const allTokens = useAllTokens(chainId)
   const opticsv1Tokens: Token[] = useMemo(() => {
     return filterTokens(Object.values(allTokens), 'Optics v1')

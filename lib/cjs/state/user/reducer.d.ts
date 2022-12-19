@@ -1,7 +1,8 @@
+import { SwapTheme } from '../../pages/Swap';
 import { SerializedPair, SerializedToken } from './actions';
 export interface UserState {
     lastUpdateVersionTimestamp?: number;
-    userDarkMode: boolean | null;
+    theme: SwapTheme | null;
     matchesDarkMode: boolean;
     userExpertMode: boolean;
     userSingleHopOnly: boolean;

@@ -2,10 +2,13 @@ import { useContractKit } from '@celo-tools/use-contractkit'
 import { ChainId, Token } from '@ubeswap/sdk'
 import React, { RefObject, useCallback, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 
 import { useToken } from '../../hooks/Tokens'
 import useTheme from '../../hooks/useTheme'
+import { AccountInfo } from '../../pages/Swap'
+import { AppState } from '../../state'
 import { useRemoveUserAddedToken, useUserAddedTokens } from '../../state/user/hooks'
 import { ButtonText, ExternalLink, ExternalLinkIcon, TrashIcon, TYPE } from '../../theme'
 import { isAddress } from '../../utils'
@@ -44,7 +47,9 @@ export default function ManageTokens({
   setImportToken: (token: Token) => void
 }) {
   const { network } = useContractKit()
-  const chainId = network.chainId as unknown as ChainId
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const chainId = (accountInfo ? accountInfo.chainId : network.chainId) as unknown as ChainId
+  const explorerUrl = accountInfo ? accountInfo.explorerUrl : network.explorer
 
   const [searchQuery, setSearchQuery] = useState<string>('')
   const theme = useTheme()
@@ -81,7 +86,7 @@ export default function ManageTokens({
         <RowBetween key={token.address} width="100%">
           <RowFixed>
             <CurrencyLogo currency={token} size={'20px'} />
-            <ExternalLink href={`${network.explorer}/address/${token.address}`}>
+            <ExternalLink href={`${explorerUrl}/address/${token.address}`}>
               <TYPE.main ml={'10px'} fontWeight={600}>
                 {token.symbol}
               </TYPE.main>
@@ -89,7 +94,7 @@ export default function ManageTokens({
           </RowFixed>
           <RowFixed>
             <TrashIcon onClick={() => removeToken(chainId, token.address)} />
-            <ExternalLinkIcon href={`${network.explorer}/address/${token.address}`} />
+            <ExternalLinkIcon href={`${explorerUrl}/address/${token.address}`} />
           </RowFixed>
         </RowBetween>
       ))

@@ -1,7 +1,8 @@
-import { useContractKit, useGetConnectedSigner } from '@celo-tools/use-contractkit'
+import { useContractKit, useProvider } from '@celo-tools/use-contractkit'
 import { MaxUint256 } from '@ethersproject/constants'
 import { TokenAmount, Trade } from '@ubeswap/sdk'
 import { useCallback, useMemo } from 'react'
+import { useSelector } from 'react-redux'
 
 import { useDoTransaction } from '../components/swap/routing'
 import { MoolaRouterTrade } from '../components/swap/routing/hooks/useTrade'
@@ -10,9 +11,12 @@ import { useMoolaConfig } from '../components/swap/routing/moola/useMoola'
 import { MinimaRouterTrade } from '../components/swap/routing/trade'
 import { MINIMA_ROUTER_ADDRESS, ROUTER_ADDRESS, UBESWAP_MOOLA_ROUTER_ADDRESS } from '../constants'
 import { useTokenAllowance } from '../data/Allowances'
+import { AccountInfo } from '../pages/Swap'
+import { AppState } from '../state'
 import { Field } from '../state/swap/actions'
 import { useHasPendingApproval } from '../state/transactions/hooks'
 import { useUserMinApprove } from '../state/user/hooks'
+import { getProviderOrSigner } from '../utils'
 import { computeSlippageAdjustedAmounts } from '../utils/prices'
 import { useTokenContract } from './useContract'
 
@@ -28,8 +32,11 @@ export function useApproveCallback(
   amountToApprove?: TokenAmount,
   spender?: string
 ): [ApprovalState, () => Promise<void>] {
-  const { address: account } = useContractKit()
-  const getConnectedSigner = useGetConnectedSigner()
+  const { address } = useContractKit()
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const account = accountInfo ? accountInfo.account : address
+  const library = useProvider()
+  const provider = getProviderOrSigner(accountInfo ? accountInfo.provider : library, account || undefined)
 
   const token = amountToApprove instanceof TokenAmount ? amountToApprove.token : undefined
   const [minApprove] = useUserMinApprove()
@@ -79,7 +86,7 @@ export function useApproveCallback(
     }
 
     // connect
-    const tokenContract = tokenContractDisconnected.connect(await getConnectedSigner())
+    const tokenContract = tokenContractDisconnected.connect(provider)
 
     if (minApprove) {
       await doTransaction(tokenContract, 'approve', {
@@ -94,16 +101,7 @@ export function useApproveCallback(
         approval: { tokenAddress: token.address, spender: spender },
       })
     }
-  }, [
-    approvalState,
-    token,
-    tokenContractDisconnected,
-    amountToApprove,
-    spender,
-    getConnectedSigner,
-    minApprove,
-    doTransaction,
-  ])
+  }, [approvalState, token, tokenContractDisconnected, amountToApprove, spender, provider, minApprove, doTransaction])
 
   return [approvalState, approve]
 }

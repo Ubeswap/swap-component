@@ -3,8 +3,11 @@ import { ChainId } from '@ubeswap/sdk'
 import React from 'react'
 import { isMobile } from 'react-device-detect'
 import { AlertTriangle, X } from 'react-feather'
+import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 
+import { AccountInfo } from '../../pages/Swap'
+import { AppState } from '../../state'
 import { useURLWarningToggle, useURLWarningVisible } from '../../state/user/hooks'
 
 const PhishAlert = styled.div<{ isActive: any }>`
@@ -36,7 +39,8 @@ export default function URLWarning() {
   const toggleURLWarning = useURLWarningToggle()
   const showURLWarning = useURLWarningVisible()
   const { network } = useContractKit()
-  const chainId = network.chainId
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const chainId = accountInfo ? accountInfo.chainId : network.chainId
 
   return isMobile ? (
     <PhishAlert isActive={showURLWarning}>

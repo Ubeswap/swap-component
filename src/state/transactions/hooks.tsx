@@ -4,6 +4,7 @@ import { ChainId } from '@ubeswap/sdk'
 import { useCallback, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { AccountInfo } from '../../pages/Swap'
 import { AppDispatch, AppState } from '../index'
 import { addTransaction } from './actions'
 import { TransactionDetails } from './reducer'
@@ -13,8 +14,10 @@ export function useTransactionAdder(): (
   response: TransactionResponse,
   customData?: { summary?: string; approval?: { tokenAddress: string; spender: string }; claim?: { recipient: string } }
 ) => void {
-  const { network, address: account } = useContractKit()
-  const chainId = network.chainId as unknown as ChainId
+  const { network, address } = useContractKit()
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const account = accountInfo ? accountInfo.account : address
+  const chainId = (accountInfo ? accountInfo.chainId : network.chainId) as unknown as ChainId
   const dispatch = useDispatch<AppDispatch>()
 
   return useCallback(
@@ -42,7 +45,8 @@ export function useTransactionAdder(): (
 // returns all the transactions for the current chain
 export function useAllTransactions(): { [txHash: string]: TransactionDetails } {
   const { network } = useContractKit()
-  const chainId = network.chainId
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const chainId = accountInfo ? accountInfo.chainId : network.chainId
 
   const state = useSelector<AppState, AppState['transactions']>((state) => state.transactions)
 

@@ -1,11 +1,14 @@
 import { useContractKit } from '@celo-tools/use-contractkit'
 import { ChainId as UbeswapChainId, JSBI, Token, TokenAmount } from '@ubeswap/sdk'
 import { useMemo } from 'react'
+import { useSelector } from 'react-redux'
 
 import ERC20_INTERFACE from '../../constants/abis/erc20'
 import { UBE } from '../../constants/tokens'
 import { useAllTokens } from '../../hooks/Tokens'
+import { AccountInfo } from '../../pages/Swap'
 import { isAddress } from '../../utils'
+import { AppState } from '../index'
 import { useMultipleContractSingleData } from '../multicall/hooks'
 
 /**
@@ -84,7 +87,10 @@ export function useCurrencyBalance(account?: string, currency?: Token): TokenAmo
 
 // mimics useAllBalances
 export function useAllTokenBalances(): { [tokenAddress: string]: TokenAmount | undefined } {
-  const { address: account } = useContractKit()
+  const { address } = useContractKit()
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const account = accountInfo ? accountInfo.account : address
+
   const allTokens = useAllTokens()
   const allTokensArray = useMemo(() => Object.values(allTokens ?? {}), [allTokens])
   const balances = useTokenBalances(account ?? undefined, allTokensArray)
@@ -93,10 +99,9 @@ export function useAllTokenBalances(): { [tokenAddress: string]: TokenAmount | u
 
 // get the total owned, unclaimed, and unharvested UBE for account
 export function useAggregateUbeBalance(): TokenAmount | undefined {
-  const {
-    address,
-    network: { chainId },
-  } = useContractKit()
+  const { address, network } = useContractKit()
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const chainId = accountInfo ? accountInfo.chainId : network.chainId
 
   const ube = chainId ? UBE[chainId as unknown as UbeswapChainId] : undefined
 

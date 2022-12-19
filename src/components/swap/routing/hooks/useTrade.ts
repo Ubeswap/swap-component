@@ -4,6 +4,7 @@ import { BigNumber, BigNumberish, ContractInterface, ethers } from 'ethers'
 import _ from 'lodash'
 import flatMap from 'lodash.flatmap'
 import React, { useMemo } from 'react'
+import { useSelector } from 'react-redux'
 
 import { ERC20_ABI } from '../../../../constants/abis/erc20'
 import {
@@ -17,6 +18,8 @@ import {
 import { PairState, usePairs } from '../../../../data/Reserves'
 import { Erc20 } from '../../../../generated'
 import { useAllTokens } from '../../../../hooks/Tokens'
+import { AccountInfo } from '../../../../pages/Swap'
+import { AppState } from '../../../../state'
 import {
   useUserDisableSmartRouting,
   useUserSingleHopOnly,
@@ -38,7 +41,8 @@ import { useDirectTradeExactIn, useDirectTradeExactOut } from './directTrades'
  */
 export function useAllCommonPairsWithMoolaDuals(tokenA?: Token, tokenB?: Token): readonly Pair[] {
   const { network } = useContractKit()
-  const chainId = network.chainId
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const chainId = accountInfo ? accountInfo.chainId : network.chainId
 
   const bases: readonly Token[] = useMemo(() => (chainId ? BASES_TO_CHECK_TRADES_AGAINST[chainId] : []), [chainId])
 
@@ -330,10 +334,12 @@ export function useMinimaTrade(
   const [allowedSlippage] = useUserSlippageTolerance()
   const [fetchUpdatedData, setFetchUpdatedData] = React.useState<boolean>(true)
   const [fetchTimeout, setFetchTimeout] = React.useState<NodeJS.Timeout | undefined>(undefined)
-  const { address: account, network } = useContractKit()
-  const { chainId } = network
+  const { address, network } = useContractKit()
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const account = accountInfo ? accountInfo.account : address
+  const chainId = accountInfo ? accountInfo.chainId : network.chainId
   const library = useProvider()
-  const provider = getProviderOrSigner(library, account || undefined)
+  const provider = getProviderOrSigner(accountInfo ? accountInfo.provider : library, account || undefined)
   const tokens = useAllTokens()
 
   const call = React.useCallback(async () => {
@@ -448,6 +454,7 @@ export function useMinimaTrade(
     deps,
     fetchTimeout,
     fetchUpdatedData,
+    minimaPartnerId,
     provider,
     singleHopOnly,
     tokenAmountIn,

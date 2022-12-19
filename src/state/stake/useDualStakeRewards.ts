@@ -4,10 +4,13 @@ import { BigNumber } from '@ethersproject/bignumber'
 import { JSBI, Token, TokenAmount } from '@ubeswap/sdk'
 import zip from 'lodash/zip'
 import { useMemo } from 'react'
+import { useSelector } from 'react-redux'
 
 import { useToken } from '../../hooks/Tokens'
 import { useMultiStakingContract } from '../../hooks/useContract'
+import { AccountInfo } from '../../pages/Swap'
 import { useSingleCallResult, useSingleContractMultipleData } from '../../state/multicall/hooks'
+import { AppState } from '../index'
 import { INT_SECONDS_IN_WEEK } from './../../constants/index'
 import { StakingInfo } from './hooks'
 
@@ -17,7 +20,9 @@ export const useMultiStakeRewards = (
   numRewards: number,
   active: boolean
 ): StakingInfo | null => {
-  const { address: owner } = useContractKit()
+  const { address: account } = useContractKit()
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const owner = accountInfo ? accountInfo.account : account
   const accountArg = useMemo(() => [owner ?? undefined], [owner])
   const stakeRewards = useMultiStakingContract(address)
 

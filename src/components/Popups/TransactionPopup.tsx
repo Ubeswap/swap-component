@@ -3,8 +3,11 @@ import { ChainId } from '@ubeswap/sdk'
 import React, { useContext } from 'react'
 import { AlertCircle, CheckCircle } from 'react-feather'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import styled, { ThemeContext } from 'styled-components'
 
+import { AccountInfo } from '../../pages/Swap'
+import { AppState } from '../../state'
 import { TYPE } from '../../theme'
 import { ExternalLink } from '../../theme/components'
 import { AutoColumn } from '../Column'
@@ -24,7 +27,9 @@ export default function TransactionPopup({
   summary?: string
 }) {
   const { network } = useContractKit()
-  const chainId = network.chainId as unknown as ChainId
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const chainId = (accountInfo ? accountInfo.chainId : network.chainId) as unknown as ChainId
+  const explorerUrl = accountInfo ? accountInfo.explorerUrl : network.explorer
 
   const theme = useContext(ThemeContext)
   const { t } = useTranslation()
@@ -38,7 +43,7 @@ export default function TransactionPopup({
         <TYPE.body fontWeight={500}>
           {summary ?? `${t('Hash')}: ` + hash.slice(0, 8) + '...' + hash.slice(58, 65)}
         </TYPE.body>
-        {chainId && <ExternalLink href={`${network.explorer}/tx/${hash}`}>{t('ViewOnCeloExplorer')}</ExternalLink>}
+        {chainId && <ExternalLink href={`${explorerUrl}/tx/${hash}`}>{t('ViewOnCeloExplorer')}</ExternalLink>}
       </AutoColumn>
     </RowNoFlex>
   )

@@ -1,13 +1,16 @@
 import { ChainId, useContractKit } from '@celo-tools/use-contractkit'
 import { Pair, Token, TokenAmount } from '@ubeswap/sdk'
 import { TokenInfo } from '@uniswap/token-lists'
-import { darken } from 'polished'
+import { darken, lighten } from 'polished'
 import React, { useCallback, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 
 import DropDown from '../../assets/svgs/dropdown'
 import useTheme from '../../hooks/useTheme'
+import { AccountInfo } from '../../pages/Swap'
+import { AppState } from '../../state'
 import { useCurrencyBalance } from '../../state/wallet/hooks'
 import { TYPE } from '../../theme'
 import CurrencyLogo from '../CurrencyLogo'
@@ -73,8 +76,8 @@ const StyledTokenName = styled.span<{ active?: boolean }>`
 
 const StyledControlButton = styled.button`
   height: 28px;
-  background-color: ${({ theme }) => theme.primary5};
-  border: 1px solid ${({ theme }) => theme.primary5};
+  background-color: ${({ theme }) => lighten(0.25, theme.primary1)};
+  border: 1px solid ${({ theme }) => lighten(0.25, theme.primary1)};
   border-radius: 0.5rem;
   font-size: 0.875rem;
 
@@ -82,7 +85,7 @@ const StyledControlButton = styled.button`
   cursor: pointer;
   margin-left: 0.3rem;
   margin-right: 0.2rem;
-  color: ${({ theme }) => theme.primaryText1};
+  color: ${({ theme }) => lighten(0.01, theme.primary1)};
   :hover {
     border: 1px solid ${({ theme }) => theme.primary1};
   }
@@ -120,6 +123,7 @@ interface CurrencyInputPanelProps {
   balanceOverride?: TokenAmount
   disabled?: boolean
   defaultTokenLists?: TokenInfo[]
+  defaultTokenLogoURI?: string
 }
 
 export default function CurrencyInputPanel({
@@ -144,11 +148,13 @@ export default function CurrencyInputPanel({
   balanceOverride,
   disabled = false,
   defaultTokenLists,
+  defaultTokenLogoURI,
 }: CurrencyInputPanelProps) {
   const { t } = useTranslation()
   const [modalOpen, setModalOpen] = useState(false)
-  const { address: account } = useContractKit()
-
+  const { address } = useContractKit()
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const account = accountInfo ? accountInfo.account : address
   const userBalance = useCurrencyBalance(account ?? undefined, currency ?? undefined)
   const selectedCurrencyBalance = balanceOverride ?? userBalance
   const theme = useTheme()
@@ -177,7 +183,7 @@ export default function CurrencyInputPanel({
                   {pair ? (
                     <DoubleCurrencyLogo currency0={pair.token0} currency1={pair.token1} size={24} margin={true} />
                   ) : currency ? (
-                    <CurrencyLogo currency={currency} size={'24px'} />
+                    <CurrencyLogo currency={currency} size={'24px'} defaultTokenLogoURI={defaultTokenLogoURI} />
                   ) : null}
                   {pair ? (
                     <StyledTokenName className="pair-name-container">

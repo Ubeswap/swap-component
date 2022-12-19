@@ -1,10 +1,11 @@
 import React from 'react';
 import { TextProps } from 'rebass';
 import { DefaultTheme } from 'styled-components';
+import { SwapTheme } from '../pages/Swap';
 import { Colors } from './styled';
 export * from './components';
-export declare function colors(darkMode: boolean): Colors;
-export declare function theme(darkMode: boolean): DefaultTheme;
+export declare function colors(darkMode: boolean, primaryColor?: string): Colors;
+export declare function theme(swapTheme: SwapTheme | null): DefaultTheme;
 export default function ThemeProvider({ children }: {
     children: React.ReactNode;
 }): JSX.Element;

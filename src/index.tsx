@@ -9,6 +9,20 @@ import Swap from './pages/Swap'
 ReactDOM.render(
   <React.StrictMode>
     <Swap
+    // theme={{
+    //   fontFamily: "'Inter', sans-serif",
+    //   primaryColor: '#00b0ff',
+    //   userDarkMode: false,
+    // }}
+    // defaultSwapToken={{
+    //   address: '0x33265D74abd5ae87cA02A4Fb0C30B7405C8b0682',
+    //   name: 'GoodDollar',
+    //   symbol: 'G$',
+    //   chainId: 42220,
+    //   decimals: 18,
+    //   logoURI:
+    //     'https://raw.githubusercontent.com/GoodDollar/GoodProtocolUI/master/src/assets/images/tokens/gd-logo.png',
+    // }}
     // defaultSwapToken={{
     //   address: '0x00400FcbF0816bebB94654259de7273f4A05c762',
     //   name: 'Poof',

@@ -39,33 +39,47 @@ import { ApprovalState, useApproveCallbackFromTrade } from '../../hooks/useAppro
 import useENS from '../../hooks/useENS'
 import { AppDispatch } from '../../state'
 import { useToggleSettingsMenu, useWalletModalToggle } from '../../state/application/hooks'
-import { Field } from '../../state/swap/actions'
+import { Field, setAccountInfo } from '../../state/swap/actions'
 import {
   useDefaultsFromURLSearch,
   useDerivedSwapInfo,
   useSwapActionHandlers,
   useSwapState,
 } from '../../state/swap/hooks'
-import { updateUserDarkMode } from '../../state/user/actions'
+import { updateTheme } from '../../state/user/actions'
 import { useExpertModeManager, useUserSingleHopOnly, useUserSlippageTolerance } from '../../state/user/hooks'
 import { ClickableText, LinkStyledButton, TYPE } from '../../theme'
 import { maxAmountSpend } from '../../utils/maxAmountSpend'
 import { computeTradePriceBreakdown, warningSeverity } from '../../utils/prices'
 import AppBody from '../AppBody'
+import { AccountInfo, SwapTheme } from '../Swap'
 
 interface Props {
+  accountInfo?: AccountInfo
+  theme?: SwapTheme
   defaultSwapToken?: TokenInfo
   defaultTokenLists?: TokenInfo[]
   minimaPartnerId?: BigNumberish
-  useDarkMode?: boolean
+  onConnectWallet?: () => void
 }
 
-export default function SwapBody({ defaultSwapToken, defaultTokenLists, minimaPartnerId, useDarkMode }: Props) {
+export default function SwapBody({
+  accountInfo,
+  theme: swapTheme,
+  defaultSwapToken,
+  defaultTokenLists,
+  minimaPartnerId,
+  onConnectWallet,
+}: Props) {
   const dispatch = useDispatch<AppDispatch>()
-  dispatch(updateUserDarkMode({ userDarkMode: useDarkMode ?? false }))
+  dispatch(updateTheme({ theme: swapTheme }))
 
   const { t } = useTranslation()
   const loadedUrlParams = useDefaultsFromURLSearch(defaultSwapToken?.address)
+
+  useEffect(() => {
+    dispatch(setAccountInfo({ accountInfo: accountInfo }))
+  }, [accountInfo, dispatch])
 
   // token warning stuff
   const [loadedInputCurrency, loadedOutputCurrency] = [
@@ -89,9 +103,9 @@ export default function SwapBody({ defaultSwapToken, defaultTokenLists, minimaPa
       return !(token.address in defaultTokens)
     })
 
-  const { address: account, network } = useContractKit()
-  const chainId = network.chainId as unknown as UbeswapChainId
-
+  const { address, network } = useContractKit()
+  const chainId = (accountInfo ? accountInfo.chainId : network.chainId) as unknown as UbeswapChainId
+  const account = accountInfo ? accountInfo.account : address
   const theme = useContext(ThemeContext)
 
   // toggle wallet when disconnected
@@ -348,6 +362,13 @@ export default function SwapBody({ defaultSwapToken, defaultTokenLists, minimaPa
               otherCurrency={currencies[Field.OUTPUT]}
               defaultTokenLists={defaultTokenLists}
               disableCurrencySelect={defaultSwapToken && currencies[Field.INPUT]?.address === defaultSwapToken.address}
+              defaultTokenLogoURI={
+                defaultSwapToken &&
+                currencies[Field.INPUT]?.address === defaultSwapToken.address &&
+                defaultSwapToken.logoURI
+                  ? defaultSwapToken.logoURI
+                  : undefined
+              }
               id="swap-currency-input"
             />
             <AutoColumn justify="space-between">
@@ -380,6 +401,13 @@ export default function SwapBody({ defaultSwapToken, defaultTokenLists, minimaPa
               onCurrencySelect={handleOutputSelect}
               otherCurrency={currencies[Field.INPUT]}
               defaultTokenLists={defaultTokenLists}
+              defaultTokenLogoURI={
+                defaultSwapToken &&
+                currencies[Field.OUTPUT]?.address === defaultSwapToken.address &&
+                defaultSwapToken.logoURI
+                  ? defaultSwapToken.logoURI
+                  : undefined
+              }
               id="swap-currency-output"
               disableCurrencySelect={defaultSwapToken && currencies[Field.OUTPUT]?.address === defaultSwapToken.address}
               disabled
@@ -431,7 +459,18 @@ export default function SwapBody({ defaultSwapToken, defaultTokenLists, minimaPa
                 <TYPE.main mb="4px">Unsupported Asset</TYPE.main>
               </ButtonPrimary>
             ) : !account ? (
-              <ButtonLight onClick={toggleWalletModal}>{t('connectWallet')}</ButtonLight>
+              <ButtonLight
+                onClick={() => {
+                  if (onConnectWallet) {
+                    onConnectWallet()
+                  } else if (!accountInfo) {
+                    toggleWalletModal()
+                  }
+                }}
+                disabled={accountInfo ? true : false}
+              >
+                {t('connectWallet')}
+              </ButtonLight>
             ) : noRoute && userHasSpecifiedInputOutput ? (
               <GreyCard style={{ textAlign: 'center' }}>
                 <TYPE.main mb="4px">Insufficient liquidity for this trade.</TYPE.main>

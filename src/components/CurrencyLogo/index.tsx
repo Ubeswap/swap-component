@@ -18,14 +18,17 @@ export default function CurrencyLogo({
   currency,
   size = '24px',
   style,
+  defaultTokenLogoURI,
 }: {
   currency?: Token
   size?: string
   style?: React.CSSProperties
+  defaultTokenLogoURI?: string
 }) {
   const uriLocations = useHttpLocations(currency instanceof WrappedTokenInfo ? currency.logoURI : undefined)
 
   const srcs: string[] = useMemo(() => {
+    if (defaultTokenLogoURI) return [defaultTokenLogoURI]
     if (currency instanceof Token) {
       if (currency instanceof WrappedTokenInfo) {
         return [...uriLocations, currency.logoURI ?? currency.address]
@@ -34,7 +37,7 @@ export default function CurrencyLogo({
       return []
     }
     return []
-  }, [currency, uriLocations])
+  }, [currency, uriLocations, defaultTokenLogoURI])
 
   return <StyledLogo size={size} srcs={srcs} alt={`${currency?.symbol ?? 'token'} logo`} style={style} />
 }

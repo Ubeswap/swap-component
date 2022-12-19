@@ -1,3 +1,4 @@
+import { AccountInfo } from '../../pages/Swap';
 export declare enum Field {
     INPUT = "INPUT",
     OUTPUT = "OUTPUT"
@@ -20,4 +21,7 @@ export declare const replaceSwapState: import("@reduxjs/toolkit").ActionCreatorW
 }, string>;
 export declare const setRecipient: import("@reduxjs/toolkit").ActionCreatorWithPayload<{
     recipient: string | null;
+}, string>;
+export declare const setAccountInfo: import("@reduxjs/toolkit").ActionCreatorWithPayload<{
+    accountInfo?: AccountInfo | undefined;
 }, string>;

@@ -1,16 +1,20 @@
 import { useContractKit, useProvider } from '@celo-tools/use-contractkit'
 import { ChainId, Trade } from '@ubeswap/sdk'
 import { useMemo } from 'react'
+import { useSelector } from 'react-redux'
 
 import { INITIAL_ALLOWED_SLIPPAGE } from '../../../constants'
 import useENS from '../../../hooks/useENS'
 import { SwapCallbackState, useSwapCallback } from '../../../hooks/useSwapCallback'
+import { AccountInfo } from '../../../pages/Swap'
+import { AppState } from '../../../state'
 import { isAddress, shortenAddress } from '../../../utils'
 import { useDoTransaction } from '.'
 import { executeMinimaTrade } from './minima/executeMinimaTrade'
 import { executeMoolaDirectTrade } from './moola/executeMoolaDirectTrade'
 import { MoolaDirectTrade } from './moola/MoolaDirectTrade'
 import { MinimaRouterTrade } from './trade'
+
 /**
  * Use callback to allow trading
  * @param trade
@@ -23,9 +27,12 @@ export const useTradeCallback = (
   allowedSlippage: number = INITIAL_ALLOWED_SLIPPAGE, // in bips
   recipientAddressOrName: string | null // the ENS name or address of the recipient of the trade, or null if swap should be returned to sender
 ): { state: SwapCallbackState; callback: null | (() => Promise<string>); error: string | null } => {
-  const { address: account, network } = useContractKit()
+  const { network, address } = useContractKit()
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const account = accountInfo ? accountInfo.account : address
+  const chainId = (accountInfo ? accountInfo.chainId : network.chainId) as unknown as ChainId
   const library = useProvider()
-  const chainId = network.chainId as unknown as ChainId
+  const provider = accountInfo ? accountInfo.provider : library
   const doTransaction = useDoTransaction()
   const { address: recipientAddress } = useENS(recipientAddressOrName)
   const recipient = recipientAddressOrName === null ? account : recipientAddress
@@ -49,7 +56,7 @@ export const useTradeCallback = (
       return { state: swapState, callback: null, error }
     }
 
-    if (!library || !trade || !account) {
+    if (!provider || !trade || !account) {
       return { state: SwapCallbackState.INVALID, callback: null, error: 'Missing dependencies' }
     }
 
@@ -57,7 +64,7 @@ export const useTradeCallback = (
       return { state: SwapCallbackState.INVALID, callback: null, error: 'Baklava is not supported' }
     }
 
-    const signer = library.getSigner(account)
+    const signer = provider.getSigner(account)
     const env = { signer, chainId, doTransaction }
     if (trade instanceof MinimaRouterTrade) {
       return {
@@ -76,5 +83,5 @@ export const useTradeCallback = (
     } else {
       return { state: SwapCallbackState.INVALID, callback: null, error: 'Unknown trade type' }
     }
-  }, [error, library, trade, account, chainId, doTransaction, swapCallback, swapState, recipient, withRecipient])
+  }, [error, provider, trade, account, chainId, doTransaction, swapCallback, swapState, recipient, withRecipient])
 }

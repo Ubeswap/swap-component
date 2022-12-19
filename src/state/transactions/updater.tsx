@@ -3,6 +3,7 @@ import { ChainId } from '@ubeswap/sdk'
 import { useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { AccountInfo } from '../../pages/Swap'
 import { useAddPopup, useBlockNumber } from '../application/hooks'
 import { AppDispatch, AppState } from '../index'
 import { checkedTransaction, finalizeTransaction } from './actions'
@@ -30,8 +31,10 @@ export function shouldCheck(
 
 export default function Updater(): null {
   const { network } = useContractKit()
-  const chainId = network.chainId as unknown as ChainId
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const chainId = (accountInfo ? accountInfo.chainId : network.chainId) as unknown as ChainId
   const library = useProvider()
+  const provider = accountInfo ? accountInfo.provider : library
 
   const lastBlockNumber = useBlockNumber()
 
@@ -44,12 +47,12 @@ export default function Updater(): null {
   const addPopup = useAddPopup()
 
   useEffect(() => {
-    if (!chainId || !library || !lastBlockNumber) return
+    if (!chainId || !provider || !lastBlockNumber) return
 
     Object.keys(transactions)
       .filter((hash) => shouldCheck(lastBlockNumber, transactions[hash]))
       .forEach((hash) => {
-        library
+        provider
           .getTransactionReceipt(hash)
           .then((receipt) => {
             if (receipt) {
@@ -88,7 +91,7 @@ export default function Updater(): null {
             console.error(`failed to check transaction hash: ${hash}`, error)
           })
       })
-  }, [chainId, library, transactions, lastBlockNumber, dispatch, addPopup])
+  }, [chainId, provider, transactions, lastBlockNumber, dispatch, addPopup])
 
   return null
 }

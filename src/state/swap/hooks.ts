@@ -16,6 +16,7 @@ import { ROUTER_ADDRESS } from '../../constants'
 import { useCurrency } from '../../hooks/Tokens'
 import useENS from '../../hooks/useENS'
 import useParsedQueryString from '../../hooks/useParsedQueryString'
+import { AccountInfo } from '../../pages/Swap'
 import { isAddress } from '../../utils'
 import { computeSlippageAdjustedAmounts } from '../../utils/prices'
 import { AppDispatch, AppState } from '../index'
@@ -119,7 +120,10 @@ export function useDerivedSwapInfo(minimaPartnerId?: BigNumberish): {
   inputError?: string
   showRamp: boolean
 } {
-  const { address: account, network } = useContractKit()
+  const { address, network } = useContractKit()
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const account = accountInfo ? accountInfo.account : address
+  const chainId = accountInfo ? accountInfo.chainId : network.chainId
 
   const {
     independentField,
@@ -203,9 +207,9 @@ export function useDerivedSwapInfo(minimaPartnerId?: BigNumberish): {
   let showRamp = false
   if (balanceIn && amountIn && balanceIn.lessThan(amountIn)) {
     if (
-      amountIn.currency.address === cUSD[network.chainId as unknown as UbeswapChainId].address ||
-      amountIn.currency.address === CELO[network.chainId as unknown as UbeswapChainId].address ||
-      amountIn.currency.address === cEUR[network.chainId as unknown as UbeswapChainId].address
+      amountIn.currency.address === cUSD[chainId as unknown as UbeswapChainId].address ||
+      amountIn.currency.address === CELO[chainId as unknown as UbeswapChainId].address ||
+      amountIn.currency.address === cEUR[chainId as unknown as UbeswapChainId].address
     ) {
       showRamp = true
     }
@@ -282,7 +286,8 @@ export function useDefaultsFromURLSearch(
   defaultSwapToken?: string
 ): { inputCurrencyId: string | undefined; outputCurrencyId: string | undefined } | undefined {
   const { network } = useContractKit()
-  const chainId = network.chainId as unknown as UbeswapChainId
+  const accountInfo = useSelector<AppState, AccountInfo | undefined>((state) => state.swap.accountInfo)
+  const chainId = (accountInfo ? accountInfo.chainId : network.chainId) as unknown as UbeswapChainId
   const dispatch = useDispatch<AppDispatch>()
   const parsedQs = useParsedQueryString()
   const [result, setResult] = useState<

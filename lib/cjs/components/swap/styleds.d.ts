@@ -6,7 +6,7 @@ export declare const ArrowWrapper: import("styled-components").StyledComponent<"
 export declare const SectionBreak: import("styled-components").StyledComponent<"div", import("styled-components").DefaultTheme, {}, never>;
 export declare const BottomGrouping: import("styled-components").StyledComponent<"div", import("styled-components").DefaultTheme, {}, never>;
 export declare const ErrorText: import("styled-components").StyledComponent<React.FunctionComponent<import("rebass").TextProps>, import("styled-components").DefaultTheme, {
-    severity?: 0 | 1 | 2 | 4 | 3 | undefined;
+    severity?: 0 | 1 | 2 | 3 | 4 | undefined;
 }, never>;
 export declare const StyledBalanceMaxMini: import("styled-components").StyledComponent<"button", import("styled-components").DefaultTheme, {}, never>;
 export declare const TruncatedText: import("styled-components").StyledComponent<React.FunctionComponent<import("rebass").TextProps>, import("styled-components").DefaultTheme, {}, never>;

@@ -15,7 +15,6 @@ import styled from 'styled-components'
 
 import GoogleAnalyticsReporter from '../components/analytics/GoogleAnalyticsReporter'
 import Polling from '../components/Header/Polling'
-import URLWarning from '../components/Header/URLWarning'
 import Popups from '../components/Popups'
 import { Alfajores, Mainnet } from '../networks'
 import store from '../state'
@@ -217,7 +216,7 @@ export default function Swap({
                 <Suspense fallback={null}>
                   <Route component={GoogleAnalyticsReporter} />
                   <Route component={DarkModeQueryParamReader} />
-                  <URLWarning />
+                  {/* <URLWarning /> */}
                   <BodyWrapper fontFamily={theme?.fontFamily}>
                     <Popups />
                     <Polling />
